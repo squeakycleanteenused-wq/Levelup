@@ -15,6 +15,8 @@ export default function Sync({ data, onLoad }: { data: StuudiumData; onLoad: (d:
   useEffect(() => {
     let pw = "";
     try { pw = localStorage.getItem("familyPw") ?? ""; } catch { /* ignoreeri */ }
+    // arenduses (npm run dev) võib parooli panna faili .env, siis ei pea seda sisestama
+    if (!pw && import.meta.env.DEV) pw = (import.meta.env.VITE_FAMILY_PASSWORD as string | undefined) ?? "";
     if (!pw || !chatConfigured) return;
     let stop = false;
     const pull = async () => {

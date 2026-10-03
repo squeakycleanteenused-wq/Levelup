@@ -1,8 +1,18 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import { resolve } from "node:path";
 
 // Brauserilaiendus: npm run build:ext -> extension/dist (laadi Operas/Chrome'is "Load unpacked")
+// Seaded võetakse ehitamisel failist .env, et ei peaks midagi laienduse aknasse kleepima.
+const env = loadEnv("production", __dirname, "VITE_");
+
 export default defineConfig({
+  define: {
+    __LEVELUP_DEFAULTS__: JSON.stringify({
+      supabaseUrl: env.VITE_SUPABASE_URL ?? "",
+      supabaseKey: env.VITE_SUPABASE_ANON_KEY ?? "",
+      password: env.VITE_FAMILY_PASSWORD ?? "",
+    }),
+  },
   root: "extension",
   publicDir: "public",
   base: "./",

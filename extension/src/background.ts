@@ -92,7 +92,8 @@ export async function runSync(): Promise<string> {
     await setStatus({ at, ok: res.ok, message, counts: res.counts });
     return message;
   } catch (e) {
-    const message = (e as Error).message;
+    let message = (e as Error).message;
+    if (/Failed to fetch|NetworkError/i.test(message)) message = "Ühendus ebaõnnestus (Stuudium või Supabase ei vasta). Kontrolli internetti ja seadeid.";
     await setStatus({ at, ok: false, message });
     return message;
   }
