@@ -65,3 +65,8 @@ nav button.on { color:var(--accent); font-weight:700; }
 header { gap:6px; flex-wrap:nowrap; }
 header h1 { font-size:22px; margin:12px 0; }
 header .chip, header .ghost { padding:4px 8px; }
+.msgs { max-height:55vh; overflow:auto; display:flex; flex-direction:column; gap:8px; padding:4px 0; }
+.msg { background:#8881; border-radius:14px; padding:8px 12px; max-width:85%; align-self:flex-start; }
+.msg.mine { background:var(--accent); color:#fff; align-self:flex-end; }
+.sendrow { display:flex; gap:8px; margin-top:8px; } .sendrow input { flex:1; }
+code { background:#8882; padding:1px 5px; border-radius:6px; }

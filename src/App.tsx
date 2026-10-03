@@ -7,6 +7,7 @@ import Decor from "./views/Decor";
 import Pomodoro from "./views/Pomodoro";
 import Falling from "./views/Falling";
 import { MAPLE, applyTheme, getAnimOn, getTheme, seasonOf, setAnimOn } from "./theme";
+import Chat from "./views/Chat";
 import Posts from "./views/Posts";
 import Attention from "./views/Attention";
 import Home from "./views/Home";
@@ -14,7 +15,7 @@ import Grades from "./views/Grades";
 import Planner from "./views/Planner";
 import CalendarSync from "./views/CalendarSync";
 
-const tabs = ["Avaleht", "Postitused", "Tähelepanu", "Hinded", "Tunniplaan", "Kalender"] as const;
+const tabs = ["Avaleht", "Postitused", "Tähelepanu", "Hinded", "Tunniplaan", "Kalender", "Chat"] as const;
 type Tab = (typeof tabs)[number];
 
 export default function App() {
@@ -91,6 +92,7 @@ export default function App() {
         {tab === "Tähelepanu" && <Attention data={data} />}
         {tab === "Hinded" && <Grades data={data} />}
         {tab === "Tunniplaan" && <Planner data={data} />}
+        {tab === "Chat" && <Chat />}
         {tab === "Kalender" && <CalendarSync data={data} />}
         <Decor season={season} />
       </main>
