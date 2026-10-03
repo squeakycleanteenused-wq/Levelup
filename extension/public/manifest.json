@@ -6,6 +6,7 @@
   "permissions": ["storage", "alarms", "offscreen", "tabs", "scripting"],
   "host_permissions": ["https://*.ope.ee/*", "https://*.supabase.co/*"],
   "background": { "service_worker": "background.js", "type": "module" },
+  "options_page": "popup.html?tab=1",
   "action": { "default_popup": "popup.html", "default_title": "Levelup" },
   "icons": { "192": "icon-192.png" }
 }

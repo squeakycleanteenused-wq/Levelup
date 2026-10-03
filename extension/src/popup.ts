@@ -14,8 +14,15 @@ async function render() {
   }
 }
 
+const inTab = new URLSearchParams(location.search).has("tab");
+if (inTab) { document.body.classList.add("tab"); $("tabhint").style.display = "none"; }
+const openInTab = () => chrome.tabs.create({ url: chrome.runtime.getURL("popup.html?tab=1") });
+$("openTab").addEventListener("click", () => { openInTab(); window.close(); });
+
 (async () => {
   const s = await getSettings();
+  // Väike popup sulgub fookuse kaotamisel (nt kopeerimisel). Seadistamiseks avame tavalise vahelehe.
+  if (!inTab && (!s.supabaseUrl || !s.supabaseKey || !s.password)) { openInTab(); window.close(); return; }
   keys.forEach((k) => { const i = document.getElementById(k) as HTMLInputElement | null; if (i) i.value = String(s[k]); });
   if (!s.supabaseUrl || !s.supabaseKey || !s.password) ($("cfg") as HTMLDetailsElement).open = true;
   await render();

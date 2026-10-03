@@ -2,6 +2,8 @@
 <html lang="et"><meta charset="utf-8">
 <style>
   body { width: 340px; font: 14px system-ui, sans-serif; margin: 12px; }
+  body.tab { width: auto; max-width: 520px; margin: 24px auto; }
+  .link { background: none; color: #c2410c; padding: 0; text-decoration: underline; }
   label { display: block; margin-top: 8px; font-size: 12px; opacity: .75; }
   input { width: 100%; box-sizing: border-box; padding: 6px; }
   button { margin-top: 10px; padding: 8px 12px; border: 0; border-radius: 8px; background: #c2410c; color: #fff; cursor: pointer; }
@@ -11,6 +13,7 @@
 <h3 style="margin:0">🍁 Levelup Stuudiumi sild</h3>
 <div id="status">Laen…</div>
 <button id="sync">Uuenda kohe</button>
+<div id="tabhint" style="margin-top:8px"><button class="link" id="openTab">Ava seaded eraldi vahelehel (kui aken sulgub)</button></div>
 <details id="cfg"><summary>Seaded</summary>
   <label>Supabase'i aadress</label><input id="supabaseUrl" placeholder="https://xxxx.supabase.co">
   <label>Supabase'i anon-võti</label><input id="supabaseKey">
