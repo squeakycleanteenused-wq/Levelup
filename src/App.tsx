@@ -23,7 +23,19 @@ type Tab = (typeof tabs)[number];
 
 export default function App() {
   const [tab, setTab] = useState<Tab>("Avaleht");
-  const [data, setData] = useState<StuudiumData | null>(null);
+  const [data, setDataRaw] = useState<StuudiumData | null>(null);
+  const [importedAt, setImportedAt] = useState(() => { try { return localStorage.getItem("importedAt") ?? ""; } catch { return ""; } });
+  // Imporditud andmed jäävad seadmesse meelde (ei pea igal avamisel uuesti importima)
+  const setData = (d: StuudiumData, fromImport = true) => {
+    setDataRaw(d);
+    if (!fromImport) return;
+    try {
+      localStorage.setItem("data", JSON.stringify({ ...d, room: undefined }));
+      const now = new Date().toISOString();
+      localStorage.setItem("importedAt", now);
+      setImportedAt(now);
+    } catch { /* ignoreeri, kui koht täis */ }
+  };
   const [live, setLive] = useState(false);
   const [error, setError] = useState("");
   const season = seasonOf();
@@ -40,7 +52,11 @@ export default function App() {
   }, [season]);
 
   useEffect(() => {
-    demoSource.load().then(setData);
+    try {
+      const saved = localStorage.getItem("data");
+      if (saved) { setDataRaw(JSON.parse(saved)); setLive(true); return; }
+    } catch { /* kasuta demot */ }
+    demoSource.load().then((d) => setDataRaw(d));
   }, []);
 
   async function onImport(e: React.ChangeEvent<HTMLInputElement>) {
@@ -81,7 +97,8 @@ export default function App() {
         <input type="file" accept=".html,.htm" multiple onChange={onImport} />
         <small>Ülevaade, Hinded, Kalender, Suhtlus, Jututuba. Andmed jäävad sinu seadmesse.</small>
       </label>
-      <Sync data={data} onLoad={setData} />
+      {importedAt && <small className="pad">Viimati imporditud: {new Date(importedAt).toLocaleString("et-EE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</small>}
+      <Sync data={data} onLoad={(d) => setData(d)} />
       <div className="card">
         <small>Kasutan äppi:</small>{" "}
         <button className={"chip" + (role === "vanem" ? " on" : "")} onClick={() => pickRole("vanem")}>Vanem</button>{" "}
