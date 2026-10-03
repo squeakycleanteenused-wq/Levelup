@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Levelup Stuudiumi sild",
+  "version": "0.1.0",
+  "description": "Toob Stuudiumi info sinu Levelup äppi (töötab sinu enda sisselogimisega, parooli ei küsi).",
+  "permissions": ["storage", "alarms", "offscreen", "tabs", "scripting"],
+  "host_permissions": ["https://*.ope.ee/*", "https://*.supabase.co/*"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": { "default_popup": "popup.html", "default_title": "Levelup" },
+  "icons": { "192": "icon-192.png" }
+}

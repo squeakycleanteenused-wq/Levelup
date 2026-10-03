@@ -7,8 +7,15 @@ const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const anon = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 export const chatConfigured = !!(url && anon);
 
+/** Laiendus annab Supabase'i andmed seadetest (mitte keskkonnamuutujatest). */
+let override: { url: string; anon: string } | null = null;
+export function setClientConfig(u: string, a: string) {
+  override = { url: u, anon: a };
+  client = null;
+}
+
 let client: SupabaseClient | null = null;
-export const sb = () => (client ??= createClient(url!, anon!, { auth: { persistSession: false } }));
+export const sb = () => (client ??= createClient(override?.url ?? url!, override?.anon ?? anon!, { auth: { persistSession: false } }));
 
 type Row = { id: string; iv: string; data: string; created_at: string };
 async function open(keys: ChatKeys, r: Row): Promise<ChatMsg | null> {
