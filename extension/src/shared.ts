@@ -25,6 +25,8 @@ export const getSettings = async (): Promise<ExtSettings> => {
   const merged = { ...defaults } as Record<string, unknown>;
   // tühje salvestatud välju ei kasutata, nii jäävad ehitamisel .env-st võetud väärtused kehtima
   Object.entries(saved).forEach(([k, v]) => { if (v !== "" && v !== undefined) merged[k] = v; });
+  // ehitamisel .env-st võetud ühenduse andmed ületavad vanu salvestatud (võimalik, et valesid) väärtusi
+  (["supabaseUrl", "supabaseKey", "password"] as const).forEach((k) => { if (defaults[k]) merged[k] = defaults[k]; });
   return merged as unknown as ExtSettings;
 };
 export const saveSettings = (s: ExtSettings) => chrome.storage.local.set({ settings: s });
