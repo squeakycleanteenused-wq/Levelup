@@ -73,3 +73,4 @@ code { background:#8882; padding:1px 5px; border-radius:6px; }
 nav { overflow-x:auto; }
 .chip.on { background:var(--accent); color:#fff; }
 .divider { text-align:center; font-size:12px; opacity:.6; margin:10px 0 4px; }
+.settings summary { cursor:pointer; } .settings .login.card { margin:8px 0; padding:0; background:none; }

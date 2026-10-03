@@ -92,19 +92,23 @@ export default function App() {
         <button className="ghost" onClick={() => { setAnimOn(!anim); setAnim(!anim); }} title="Animatsioon">{anim ? "🍂" : "⏸"}</button>
       </header>
 
-      <label className="card" style={{ display: "block" }}>
+      <details className="card settings" open={!live}>
+        <summary><b>⚙️ Import ja seaded</b></summary>
+      <label style={{ display: "block", marginTop: 8 }}>
         <b>Impordi Stuudiumi lehed (HTML)</b>
         <input type="file" accept=".html,.htm" multiple onChange={onImport} />
         <small>Ülevaade, Hinded, Kalender, Suhtlus, Jututuba. Andmed jäävad sinu seadmesse.</small>
       </label>
       {importedAt && <small className="pad">Viimati imporditud: {new Date(importedAt).toLocaleString("et-EE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</small>}
       <Sync data={data} onLoad={(d) => setData(d)} />
-      <div className="card">
+      <div style={{ marginTop: 8 }}>
         <small>Kasutan äppi:</small>{" "}
         <button className={"chip" + (role === "vanem" ? " on" : "")} onClick={() => pickRole("vanem")}>Vanem</button>{" "}
         <button className={"chip" + (role === "õpilane" ? " on" : "")} onClick={() => pickRole("õpilane")}>Õpilane</button>
         {role === "õpilane" && <div><small>Vanemate chat on õpilasvaates peidus.</small></div>}
       </div>
+
+      </details>
 
       {!live && isTauri() && (
         <form className="card login" onSubmit={connect}>
