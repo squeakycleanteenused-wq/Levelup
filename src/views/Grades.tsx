@@ -26,6 +26,15 @@ export default function Grades({ data }: { data: StuudiumData }) {
           </BarChart>
         </ResponsiveContainer>
       </section>
+      <section className="card">
+        <h2>Kokkuvõtvad hinded</h2>
+        {data.summary.map((r) => (
+          <p key={r.subject}>
+            <b>{r.subject}</b>{" "}
+            {r.years.map((y) => `${y.year}: ${y.periods.join(" | ")} → ${y.final ?? ""}`).join("; ")}
+          </p>
+        ))}
+      </section>
     </>
   );
 }

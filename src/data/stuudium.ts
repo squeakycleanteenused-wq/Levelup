@@ -30,6 +30,7 @@ function parseGrades(doc: Document): Grade[] {
   return [...doc.querySelectorAll("[data-grade]")].map((el) => ({
     subject: el.getAttribute("data-subject") ?? "",
     value: Number(el.getAttribute("data-grade")),
+    label: el.getAttribute("data-grade") ?? "",
     date: el.getAttribute("data-date") ?? "",
     kind: el.getAttribute("data-kind") ?? "",
   }));
@@ -38,6 +39,6 @@ function parseGrades(doc: Document): Grade[] {
 export const stuudiumSource: DataSource = {
   async load(): Promise<StuudiumData> {
     const grades = parseGrades(await page("/diary/grades")); // PLACEHOLDER tee
-    return { student: "", grades, schedule: [], events: [], homework: [], absences: [] };
+    return { student: "", grades, schedule: [], events: [], summary: [], homework: [], absences: [] };
   },
 };

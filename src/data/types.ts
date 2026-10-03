@@ -1,6 +1,7 @@
 export type Grade = {
   subject: string;
-  value: number; // 1-5
+  value: number | null; // 1-5; null = mittearvuline (A, MA, ...)
+  label: string; // kuvatav hinne: "4", "A"
   date: string; // ISO
   kind: string; // nt "Kontrolltöö"
   weight?: number;
@@ -21,6 +22,9 @@ export type Homework = {
   done?: boolean;
 };
 
+export type YearSummary = { year: string; periods: string[]; final?: string };
+export type SummaryRow = { subject: string; years: YearSummary[] };
+
 export type Absence = { date: string; subject: string; excused: boolean };
 
 export type CalEvent = {
@@ -36,6 +40,7 @@ export type CalEvent = {
 
 export type StuudiumData = {
   events: CalEvent[];
+  summary: SummaryRow[];
   student: string;
   grades: Grade[];
   schedule: Lesson[];

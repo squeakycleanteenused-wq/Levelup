@@ -14,6 +14,7 @@ const demo: StuudiumData = {
   grades: seed.map((value, i) => ({
     subject: subjects[i % subjects.length],
     value,
+    label: String(value),
     date: d(-100 + i * 5),
     kind: i % 4 === 0 ? "Kontrolltöö" : "Tunnihinne",
   })),
@@ -37,6 +38,7 @@ const demo: StuudiumData = {
     { subject: "Eesti keel", text: "Kirjand 'Minu suvi'", due: d(3) },
     { subject: "Bioloogia", text: "Õppida peatükk 5", due: d(5) },
   ],
+  summary: [{ subject: "Matemaatika", years: [{ year: "4b (25/26)", periods: ["4", "3", "4"], final: "4" }] }],
   events: [
     { id: "s1", title: "Kooli sügisbänd", start: d(6), allDay: true, scope: "school" },
     { id: "s2", title: "Lastevanemate koosolek", start: d(9) + "T18:00", end: d(9) + "T19:30", place: "Aula", scope: "school" },

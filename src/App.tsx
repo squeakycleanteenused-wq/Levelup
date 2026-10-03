@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { StuudiumData } from "./data/types";
 import { demoSource } from "./data/demo";
 import { isTauri, login, stuudiumSource } from "./data/stuudium";
+import { importPages } from "./data/importPages";
 import Home from "./views/Home";
 import Grades from "./views/Grades";
 import Planner from "./views/Planner";
@@ -19,6 +20,12 @@ export default function App() {
   useEffect(() => {
     demoSource.load().then(setData);
   }, []);
+
+  async function onImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = [...(e.target.files ?? [])];
+    if (files.length && data) setData(await importPages(files, data));
+    setLive(true);
+  }
 
   async function connect(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -41,6 +48,12 @@ export default function App() {
         <h1>Levelup</h1>
         <span className="badge">{live ? "Stuudium" : "Demo"}</span>
       </header>
+
+      <label className="card">
+        <b>Impordi Stuudiumi lehed (HTML)</b>
+        <input type="file" accept=".html,.htm" multiple onChange={onImport} />
+        <small>Ülevaade, Kokkuvõtvad hinded ja Kalender. Andmed jäävad sinu seadmesse.</small>
+      </label>
 
       {!live && isTauri() && (
         <form className="card login" onSubmit={connect}>
