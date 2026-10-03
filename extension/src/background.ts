@@ -112,3 +112,15 @@ chrome.runtime.onMessage.addListener((m, _s, send) => {
   if (m?.target === "background" && m.type === "sync") { runSync().then((message) => send({ message })); return true; }
   return false;
 });
+
+// Ikooni klõps avab (või toob ette) tavalise vahelehe. Väike popup sulgub fookuse kaotamisel ja sobib halvasti seadistamiseks.
+const PANEL = () => chrome.runtime.getURL("popup.html?tab=1");
+chrome.action.onClicked.addListener(async () => {
+  const existing = (await chrome.tabs.query({})).find((t) => t.url === PANEL());
+  if (existing?.id) {
+    await chrome.tabs.update(existing.id, { active: true });
+    if (existing.windowId) await chrome.windows.update(existing.windowId, { focused: true });
+  } else {
+    await chrome.tabs.create({ url: PANEL() });
+  }
+});
