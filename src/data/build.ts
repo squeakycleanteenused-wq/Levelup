@@ -16,7 +16,7 @@ export function buildFromDocs(docs: Document[], base: StuudiumData, o: BuildOpts
       data.classNotes = parseClassNotes(doc, o.year);
       if (!data.remarks.length) data.remarks = parseRemarks(doc, o.year);
       if (!data.grades.length) data.grades = parseDashboardGrades(doc, o.year);
-      data.homework = parseTodos(doc).map((t) => ({ ...t, text: (t.isTest ? "Kontrolltöö: " : "") + t.text }));
+      data.homework = parseTodos(doc).map((t) => ({ ...t, text: t.isTest ? (t.text ? "Kontrolltöö: " + t.text : "Kontrolltöö") : t.text }));
     }
     if (doc.querySelector("table.student_lessons_grades")) {
       // Tabel on täpseim allikas (kõik päevad, puudumised, ! märkused): ületab ülevaate lehe

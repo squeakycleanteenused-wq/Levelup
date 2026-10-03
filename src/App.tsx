@@ -1,84 +1,61 @@
 import { useEffect, useState } from "react";
 import type { StuudiumData } from "./data/types";
-import { demoSource } from "./data/demo";
-import { isTauri, login, stuudiumSource } from "./data/stuudium";
-import { importPages } from "./data/importPages";
-import Decor from "./views/Decor";
-import Pomodoro from "./views/Pomodoro";
-import Falling from "./views/Falling";
+import { deriveKeys } from "./data/chatCrypto";
+import { chatConfigured } from "./data/chatApi";
+import { loadSnapshot } from "./data/snapshot";
 import { MAPLE, applyTheme, getAnimOn, getTheme, seasonOf, setAnimOn } from "./theme";
-import Room from "./views/Room";
-import { getSettings, saveSettings, type Role } from "./data/settings";
-import Sync from "./views/Sync";
-import Chat from "./views/Chat";
-import Posts from "./views/Posts";
+import Falling from "./views/Falling";
+import Pomodoro from "./views/Pomodoro";
+import Decor from "./views/Decor";
+import Status from "./views/Status";
+import Homework from "./views/Homework";
 import Attention from "./views/Attention";
-import Home from "./views/Home";
-import Grades from "./views/Grades";
-import Planner from "./views/Planner";
-import CalendarSync from "./views/CalendarSync";
+import { ClassPosts } from "./views/Posts";
+import Chat from "./views/Chat";
+import Unlock from "./views/Unlock";
 
-const tabs = ["Avaleht", "Postitused", "Tähelepanu", "Hinded", "Tunniplaan", "Kalender", "Jututuba", "Vanemad"] as const;
-type Tab = (typeof tabs)[number];
+const get = (k: string) => { try { return localStorage.getItem(k) ?? ""; } catch { return ""; } };
+const put = (k: string, v: string) => { try { localStorage.setItem(k, v); } catch { /* ignoreeri */ } };
+const password = () => get("familyPw") || (import.meta.env.DEV ? ((import.meta.env.VITE_FAMILY_PASSWORD as string | undefined) ?? "") : "");
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>("Avaleht");
-  const [data, setDataRaw] = useState<StuudiumData | null>(null);
-  const [importedAt, setImportedAt] = useState(() => { try { return localStorage.getItem("importedAt") ?? ""; } catch { return ""; } });
-  // Imporditud andmed jäävad seadmesse meelde (ei pea igal avamisel uuesti importima)
-  const setData = (d: StuudiumData, fromImport = true) => {
-    setDataRaw(d);
-    if (!fromImport) return;
-    try {
-      localStorage.setItem("data", JSON.stringify({ ...d, room: undefined }));
-      const now = new Date().toISOString();
-      localStorage.setItem("importedAt", now);
-      setImportedAt(now);
-    } catch { /* ignoreeri, kui koht täis */ }
-  };
-  const [live, setLive] = useState(false);
-  const [error, setError] = useState("");
   const season = seasonOf();
-  const [role, setRole] = useState<Role>(getSettings().role);
-  const visibleTabs = tabs.filter((t) => role === "vanem" || t !== "Vanemad");
-  const pickRole = (r: Role) => { setRole(r); saveSettings({ ...getSettings(), role: r }); if (r === "õpilane" && tab === "Vanemad") setTab("Avaleht"); };
+  const [tab, setTab] = useState<"home" | "chat">("home");
+  const [data, setData] = useState<StuudiumData | null>(() => { try { return JSON.parse(get("data")) as StuudiumData; } catch { return null; } });
+  const [updated, setUpdated] = useState(get("updatedAt"));
+  const [pw, setPw] = useState(password());
+  const [error, setError] = useState("");
+  const [theme, setTheme] = useState(getTheme());
   const [anim, setAnim] = useState(getAnimOn() && !matchMedia("(prefers-reduced-motion: reduce)").matches);
 
-  const [theme, setTheme] = useState(getTheme());
   useEffect(() => applyTheme(theme), [theme]);
+  useEffect(() => { document.documentElement.dataset.season = season; }, [season]);
 
+  // Andmed tulevad pilvest (neid uuendab brauserilaiendus). Laeme avamisel ja iga 5 minuti järel.
   useEffect(() => {
-    document.documentElement.dataset.season = season;
-  }, [season]);
+    if (!pw || !chatConfigured) return;
+    let stop = false;
+    const pull = async () => {
+      try {
+        const s = await loadSnapshot(await deriveKeys(pw));
+        if (stop) return;
+        if (!s) return setError("Selle parooliga pole andmeid. Kontrolli parooli või uuenda laiendusega.");
+        setError("");
+        setData(s.data);
+        setUpdated(s.at);
+        put("data", JSON.stringify(s.data));
+        put("updatedAt", s.at);
+      } catch (e) {
+        if (!stop) setError("Ühendus pilvega ebaõnnestus: " + String(e));
+      }
+    };
+    pull();
+    const t = setInterval(pull, 5 * 60_000);
+    return () => { stop = true; clearInterval(t); };
+  }, [pw]);
 
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("data");
-      if (saved) { setDataRaw(JSON.parse(saved)); setLive(true); return; }
-    } catch { /* kasuta demot */ }
-    demoSource.load().then((d) => setDataRaw(d));
-  }, []);
-
-  async function onImport(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = [...(e.target.files ?? [])];
-    if (files.length && data) setData(await importPages(files, data));
-    setLive(true);
-  }
-
-  async function connect(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const f = new FormData(e.currentTarget);
-    try {
-      setError("");
-      await login(String(f.get("u")), String(f.get("p")));
-      setData(await stuudiumSource.load());
-      setLive(true);
-    } catch (err) {
-      setError(String(err));
-    }
-  }
-
-  if (!data) return <p className="pad">Laen…</p>;
+  const unlock = (p: string) => { put("familyPw", p); setPw(p); };
+  const when = updated ? new Date(updated).toLocaleString("et-EE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
 
   return (
     <div className="app">
@@ -86,58 +63,34 @@ export default function App() {
       <header>
         <svg className="maple" viewBox="0 0 24 24" width="34" height="34" aria-label="Variku vahtraleht"><path d={MAPLE} /></svg>
         <h1>Levelup</h1>
-        <span className="badge">{live ? "Stuudium" : "Demo"}</span>
         <Pomodoro />
         <button className="chip" onClick={() => setTheme(theme === "auto" ? "light" : theme === "light" ? "dark" : "auto")} title="Teema: auto, hele, tume">{theme === "auto" ? "🌗" : theme === "light" ? "☀️" : "🌙"}</button>
         <button className="ghost" onClick={() => { setAnimOn(!anim); setAnim(!anim); }} title="Animatsioon">{anim ? "🍂" : "⏸"}</button>
       </header>
 
-      <details className="card settings" open={!live}>
-        <summary><b>⚙️ Import ja seaded</b></summary>
-      <label style={{ display: "block", marginTop: 8 }}>
-        <b>Impordi Stuudiumi lehed (HTML)</b>
-        <input type="file" accept=".html,.htm" multiple onChange={onImport} />
-        <small>Ülevaade, Hinded, Kalender, Suhtlus, Jututuba. Andmed jäävad sinu seadmesse.</small>
-      </label>
-      {importedAt && <small className="pad">Viimati imporditud: {new Date(importedAt).toLocaleString("et-EE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</small>}
-      <Sync data={data} onLoad={(d) => setData(d)} />
-      <div style={{ marginTop: 8 }}>
-        <small>Kasutan äppi:</small>{" "}
-        <button className={"chip" + (role === "vanem" ? " on" : "")} onClick={() => pickRole("vanem")}>Vanem</button>{" "}
-        <button className={"chip" + (role === "õpilane" ? " on" : "")} onClick={() => pickRole("õpilane")}>Õpilane</button>
-        {role === "õpilane" && <div><small>Vanemate chat on õpilasvaates peidus.</small></div>}
-      </div>
-
-      </details>
-
-      {!live && isTauri() && (
-        <form className="card login" onSubmit={connect}>
-          <b>Ühenda Stuudiumiga</b>
-          <input name="u" placeholder="Kasutajanimi" autoComplete="username" required />
-          <input name="p" type="password" placeholder="Parool" autoComplete="current-password" required />
-          <button>Logi sisse</button>
-          {error && <small className="err">{error}</small>}
-        </form>
+      {tab === "home" && (
+        <main>
+          {!pw && <Unlock error={error} onUnlock={unlock} />}
+          {pw && error && !data && <p className="err pad">{error}</p>}
+          {pw && !data && !error && <p className="pad">Laen…</p>}
+          {data && (
+            <>
+              <Status data={data} />
+              <Attention data={data} />
+              <ClassPosts data={data} limit={5} />
+              <Homework data={data} />
+              {when && <small className="pad">Uuendatud {when}</small>}
+              {error && <small className="err pad"> {error}</small>}
+            </>
+          )}
+          <Decor season={season} />
+        </main>
       )}
-
-      <main>
-        {tab === "Avaleht" && <Home data={data} />}
-        {tab === "Postitused" && <Posts data={data} />}
-        {tab === "Tähelepanu" && <Attention data={data} />}
-        {tab === "Hinded" && <Grades data={data} />}
-        {tab === "Tunniplaan" && <Planner data={data} />}
-        {tab === "Jututuba" && <Room data={data} />}
-        {tab === "Vanemad" && role === "vanem" && <Chat />}
-        {tab === "Kalender" && <CalendarSync data={data} />}
-        <Decor season={season} />
-      </main>
+      {tab === "chat" && <main><Chat /></main>}
 
       <nav>
-        {visibleTabs.map((t) => (
-          <button key={t} className={t === tab ? "on" : ""} onClick={() => setTab(t)}>
-            {t}
-          </button>
-        ))}
+        <button className={tab === "home" ? "on" : ""} onClick={() => setTab("home")}>Avaleht</button>
+        <button className={tab === "chat" ? "on" : ""} onClick={() => setTab("chat")}>Vanemate chat</button>
       </nav>
     </div>
   );

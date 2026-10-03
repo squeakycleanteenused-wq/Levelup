@@ -7,12 +7,12 @@ export type AttentionItem = { severity: Severity; kind: string; title: string; d
 /** Märkesõnad, mis viitavad negatiivsele märkusele (muuda vastavalt vajadusele). */
 const NEGATIVE = /lohakas|unustas|ei tei|tegemata|hilines|segas|ebaviisakas|puudus (vahend|õpik|vihik)|pole kaasas|ei olnud kaasas|korrata|parandada/i;
 
-export function attention(data: StuudiumData, today = new Date().toISOString().slice(0, 10), badMax = 2): AttentionItem[] {
+export function attention(data: StuudiumData, today = new Date().toISOString().slice(0, 10), badMax = 3): AttentionItem[] {
   const items: AttentionItem[] = [];
 
   for (const g of data.grades) {
     if ((g.value !== null && g.value <= badMax) || /^MA$/i.test(g.label))
-      items.push({ severity: 3, kind: "Madal hinne", title: `${g.subject}: ${g.label}`, detail: g.kind, date: g.date });
+      items.push({ severity: 3, kind: "Madal hinne", title: `${g.subject}: ${g.label}`, detail: g.note ?? (g.kind === "Hinne" ? "" : g.kind), date: g.date });
   }
 
   for (const r of data.remarks) {
@@ -35,8 +35,12 @@ export function attention(data: StuudiumData, today = new Date().toISOString().s
   for (const h of data.homework) {
     if (h.done || done.has(h.id)) continue;
     if (h.due < today) items.push({ severity: 2, kind: "Tähtaeg möödas", title: h.subject, detail: h.text, date: h.due });
-    else if (h.text.startsWith("Kontrolltöö") && h.due <= week) items.push({ severity: 2, kind: "Kontrolltöö", title: h.subject, detail: h.text.replace("Kontrolltöö: ", ""), date: h.due });
+    else if (h.text.startsWith("Kontrolltöö") && h.due <= week) items.push({ severity: 2, kind: "Kontrolltöö", title: h.subject, detail: h.text.replace(/^Kontrolltöö:? ?/, ""), date: h.due });
   }
 
   return items.sort((a, b) => b.severity - a.severity || b.date.localeCompare(a.date));
 }
+
+/** Õpilase tegevus: madalad hinded (3 ja alla), märkused (!), hilinemised, tegemata tööd, põhjuseta puudumised, negatiivne tagasiside. */
+const CONDUCT = new Set(["Madal hinne", "Märkus (!)", "Põhjendamata puudumine", "Tegemata töö", "Hilinemine", "Tagasiside", "Märge"]);
+export const conduct = (data: StuudiumData) => attention(data).filter((i) => CONDUCT.has(i.kind));

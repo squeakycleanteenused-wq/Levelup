@@ -5,6 +5,14 @@ import type { ChatRoom, Post, ClassNote, LessonCell, Absence, CalEvent, Grade, H
  * Töötavad nii brauseris kui Node'is (DOMParser/jsdom), sisend on Document.
  */
 const txt = (el: Element | null | undefined) => (el?.textContent ?? "").replace(/\s+/g, " ").trim();
+/** Loetav tekst: reavahetused tühikuks, lingi URL (.slh) välja, et tekst ei jookseks kokku. */
+const readable = (el: Element | null | undefined) => {
+  if (!el) return "";
+  const c = el.cloneNode(true) as Element;
+  c.querySelectorAll("br").forEach((b) => b.replaceWith(" "));
+  c.querySelectorAll(".slh").forEach((x) => x.remove());
+  return (c.textContent ?? "").replace(/\s+/g, " ").trim();
+};
 const numeric = (label: string) => (/^[1-5]$/.test(label) ? Number(label) : null);
 
 /** /users/summary/<id>: kokkuvõtvad hinded aastate kaupa */
@@ -72,7 +80,7 @@ export function parseTodos(doc: Document): (Homework & { id: string; isTest: boo
       {
         id: todo.querySelector("input")?.getAttribute("data-k") ?? "",
         subject: txt(todo.querySelector(".subject_name")),
-        text: txt(todo.querySelector(".todo_content")),
+        text: readable(todo.querySelector(".todo_content")),
         due: `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`,
         isTest: todo.classList.contains("is_test"),
       },
@@ -190,7 +198,7 @@ export function parseGradeGrid(doc: Document): { grades: Grade[]; remarks: Remar
           const c = h.cloneNode(true) as Element;
           const due = txt(c.querySelector("strong b")); // "05.10"
           c.querySelector("strong")?.remove(); // "Kodutöö 05.10:" on juba kirjas, ei korda
-          return { due, text: txt(c) };
+          return { due, text: readable(c) };
         })
         .filter((x) => x.text);
       const cell: LessonCell = { subject, date, topics, homework };

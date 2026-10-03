@@ -74,3 +74,6 @@ nav { overflow-x:auto; }
 .chip.on { background:var(--accent); color:#fff; }
 .divider { text-align:center; font-size:12px; opacity:.6; margin:10px 0 4px; }
 .settings summary { cursor:pointer; } .settings .login.card { margin:8px 0; padding:0; background:none; }
+nav { justify-content: center; } nav button { flex: 1 1 0; }
+.lead { font-size:19px; margin:4px 0 8px; } .status ul { margin:6px 0 10px 18px; padding:0; }
+.hw { display:flex; gap:10px; align-items:flex-start; padding:6px 0; border-bottom:1px solid #8882; } .hw input { margin-top:4px; width:20px; height:20px; }

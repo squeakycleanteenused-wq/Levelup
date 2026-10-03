@@ -1,12 +1,19 @@
 import { useState } from "react";
 import type { Post, StuudiumData } from "../data/types";
 import { postsSeen } from "../data/seen";
+import { daysFromToday } from "../data/dates";
 
 export const sig = (p: Post) => `${p.activity}@${p.commentCount}`;
 
+/** Uus/uuendatud ainult viimase 14 päeva postitustel; vanemad loetakse nähtuks, et ei tekiks müra. */
+export function postState(p: Post): "uus" | "uuendatud" | "nähtud" {
+  const st = postsSeen.state(p.id, sig(p));
+  return st !== "nähtud" && daysFromToday(p.activity) < -14 ? "nähtud" : st;
+}
+
 function Item({ p }: { p: Post }) {
   const [open, setOpen] = useState(false);
-  const st = postsSeen.state(p.id, sig(p));
+  const st = postState(p);
   return (
     <div className="att" onClick={() => setOpen(!open)} style={{ borderLeft: `4px solid ${st === "nähtud" ? "#8884" : "#d33"}`, cursor: "pointer" }}>
       {st !== "nähtud" && <span className="badge new">{st === "uus" ? "Uus" : "Uuendatud"}</span>}{" "}
@@ -22,9 +29,9 @@ const byActivity = (a: Post, b: Post) => b.activity.localeCompare(a.activity);
 
 /** Klassijuhataja ja oma klassi postitused esikohal; ülejäänud kooli teated all. */
 export function ClassPosts({ data, limit }: { data: StuudiumData; limit?: number }) {
-  const mine = data.posts.filter((p) => p.fromClassTeacher || p.forMyClass).sort(byActivity);
+  const mine = data.posts.filter((p) => p.fromClassTeacher).sort(byActivity);
   const shown = limit ? mine.slice(0, limit) : mine;
-  const fresh = mine.filter((p) => postsSeen.state(p.id, sig(p)) !== "nähtud");
+  const fresh = mine.filter((p) => postState(p) !== "nähtud");
   return (
     <section className="card teacher">
       <h2>{data.classTeacher ?? "Klassijuhataja"} · {data.className ?? ""} {fresh.length ? `(${fresh.length} uut/uuendatud)` : ""}</h2>
