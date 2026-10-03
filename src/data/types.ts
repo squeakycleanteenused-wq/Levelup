@@ -85,6 +85,8 @@ export type StuudiumData = {
   posts: Post[];
   cells: LessonCell[];
   room?: ChatRoom;
+  baseUrl?: string; // nt https://variku.ope.ee
+  links?: Record<string, string>; // aine nimi -> Stuudiumi aine leht (hinded, kommentaarid, tunnid)
   classNotes: ClassNote[];
   classTeacher?: string;
   className?: string;

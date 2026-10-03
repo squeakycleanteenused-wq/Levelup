@@ -5,14 +5,20 @@ export const emptyData = (student = ""): StuudiumData => ({
   student, grades: [], schedule: [], homework: [], events: [], summary: [], remarks: [], posts: [], cells: [], classNotes: [], absences: [],
 });
 
-export type BuildOpts = { year: number; teacher: string; className: string };
+export type BuildOpts = { year: number; teacher: string; className: string; baseUrl?: string };
 
 /** Ehitab andmed Stuudiumi lehtedest (Document'idest). Kasutavad nii äpp (import) kui brauserilaiendus. */
 export function buildFromDocs(docs: Document[], base: StuudiumData, o: BuildOpts): StuudiumData {
-  const data: StuudiumData = { ...base, grades: [], homework: [], events: [], summary: [], remarks: [], posts: [], cells: [], classNotes: [], schedule: [], absences: [] };
+  const links: Record<string, string> = {};
+  const abs = (h: string) => (o.baseUrl && h.startsWith("/") ? o.baseUrl + h : h);
+  const data: StuudiumData = { ...base, baseUrl: o.baseUrl, grades: [], homework: [], events: [], summary: [], remarks: [], posts: [], cells: [], classNotes: [], schedule: [], absences: [] };
   for (const doc of docs) {
     if (doc.querySelector(".users-summary-v1")) data.summary = parseSummary(doc);
     if (doc.querySelector("#dashboard_recent")) {
+      doc.querySelectorAll('.stream-entry-context a[href*="/subjects/student/"]').forEach((a) => {
+        const subj = (a.textContent ?? "").split(",")[0].trim();
+        if (subj && !links[subj]) links[subj] = abs(a.getAttribute("href")!);
+      });
       data.classNotes = parseClassNotes(doc, o.year);
       if (!data.remarks.length) data.remarks = parseRemarks(doc, o.year);
       if (!data.grades.length) data.grades = parseDashboardGrades(doc, o.year);
@@ -24,6 +30,7 @@ export function buildFromDocs(docs: Document[], base: StuudiumData, o: BuildOpts
       data.grades = grid.grades;
       data.remarks = grid.remarks;
       data.cells = grid.cells;
+      Object.entries(grid.links).forEach(([k, v]) => (links[k] = abs(v)));
     }
     if (doc.querySelector(".chat-room-messages")) data.room = parseChatRoom(doc) ?? undefined;
     if (doc.querySelector(".post-in-list")) {
@@ -40,5 +47,6 @@ export function buildFromDocs(docs: Document[], base: StuudiumData, o: BuildOpts
     }
     if (doc.querySelector(".suhtlus-calendar, .cal-day")) data.events = parseCalendar(doc);
   }
+  data.links = links;
   return data;
 }

@@ -2,7 +2,7 @@ import type { StuudiumData } from "./types";
 import { done } from "./seen";
 
 export type Severity = 3 | 2 | 1; // 3 = kiire, 2 = oluline, 1 = info
-export type AttentionItem = { severity: Severity; kind: string; title: string; detail: string; date: string };
+export type AttentionItem = { severity: Severity; kind: string; title: string; detail: string; date: string; url?: string };
 
 /** Märkesõnad, mis viitavad negatiivsele märkusele (muuda vastavalt vajadusele). */
 const NEGATIVE = /lohakas|unustas|ei tei|tegemata|hilines|segas|ebaviisakas|puudus (vahend|õpik|vihik)|pole kaasas|ei olnud kaasas|korrata|parandada/i;
@@ -38,6 +38,8 @@ export function attention(data: StuudiumData, today = new Date().toISOString().s
     else if (h.text.startsWith("Kontrolltöö") && h.due <= week) items.push({ severity: 2, kind: "Kontrolltöö", title: h.subject, detail: h.text.replace(/^Kontrolltöö:? ?/, ""), date: h.due });
   }
 
+  const link = (subject: string) => data.links?.[subject];
+  items.forEach((i) => { i.url = link(i.title.split(":")[0].replace(/ \(.*\)$/, "")); });
   return items.sort((a, b) => b.severity - a.severity || b.date.localeCompare(a.date));
 }
 

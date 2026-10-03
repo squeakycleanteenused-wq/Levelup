@@ -176,12 +176,15 @@ export function parseClassNotes(doc: Document, year: number): ClassNote[] {
  * Sümbolid: H hilines, P puudus (põhjusega/põhjuseta), V vabastatud, K kodutöö tegemata,
  * ! tähelepanu (õpetaja märkus), jutumull = õpetaja tagasiside hindele.
  */
-export function parseGradeGrid(doc: Document): { grades: Grade[]; remarks: Remark[]; cells: LessonCell[] } {
+export function parseGradeGrid(doc: Document): { grades: Grade[]; remarks: Remark[]; cells: LessonCell[]; links: Record<string, string> } {
+  const links: Record<string, string> = {};
   const grades: Grade[] = [];
   const remarks: Remark[] = [];
   const cells: LessonCell[] = [];
   doc.querySelectorAll("table.student_lessons_grades tbody tr").forEach((tr) => {
     const subject = txt(tr.querySelector("th"));
+    const href = tr.querySelector("th a")?.getAttribute("href");
+    if (href && subject) links[subject] = href;
     tr.querySelectorAll("td.summary").forEach((td) => {
       const ymd = /lesson_(\d{8})/.exec(td.className)?.[1];
       if (!ymd) return;
@@ -231,7 +234,7 @@ export function parseGradeGrid(doc: Document): { grades: Grade[]; remarks: Remar
       if (topics.length || homework.length || td.querySelector(".grade_container")) cells.push(cell);
     });
   });
-  return { grades, remarks, cells };
+  return { grades, remarks, cells, links };
 }
 
 /** Nimi sobib eesnime järgi ("Olena" leiab "Olena Shanina"), tõstutundetult. */

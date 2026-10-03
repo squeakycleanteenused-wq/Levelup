@@ -13,6 +13,7 @@ export default function Attention({ data }: { data: StuudiumData }) {
     <div key={n} className="att" style={{ borderLeft: `4px solid ${colors[i.severity]}` }}>
       <b style={{ color: colors[i.severity] }}>{i.kind}</b> · {i.title} <small>{rel(i.date)}</small>
       {i.detail && <div><small>{i.detail}</small></div>}
+      {i.url && <div><a className="ext" href={i.url} target="_blank" rel="noreferrer">Ava Stuudiumis →</a></div>}
     </div>
   );
   return (
