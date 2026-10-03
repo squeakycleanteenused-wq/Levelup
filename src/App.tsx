@@ -3,6 +3,10 @@ import type { StuudiumData } from "./data/types";
 import { demoSource } from "./data/demo";
 import { isTauri, login, stuudiumSource } from "./data/stuudium";
 import { importPages } from "./data/importPages";
+import Decor from "./views/Decor";
+import Pomodoro from "./views/Pomodoro";
+import Falling from "./views/Falling";
+import { MAPLE, applyTheme, getAnimOn, getTheme, seasonOf, setAnimOn } from "./theme";
 import Posts from "./views/Posts";
 import Attention from "./views/Attention";
 import Home from "./views/Home";
@@ -18,6 +22,15 @@ export default function App() {
   const [data, setData] = useState<StuudiumData | null>(null);
   const [live, setLive] = useState(false);
   const [error, setError] = useState("");
+  const season = seasonOf();
+  const [anim, setAnim] = useState(getAnimOn() && !matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  const [theme, setTheme] = useState(getTheme());
+  useEffect(() => applyTheme(theme), [theme]);
+
+  useEffect(() => {
+    document.documentElement.dataset.season = season;
+  }, [season]);
 
   useEffect(() => {
     demoSource.load().then(setData);
@@ -46,12 +59,17 @@ export default function App() {
 
   return (
     <div className="app">
+      {anim && <Falling season={season} />}
       <header>
+        <svg className="maple" viewBox="0 0 24 24" width="34" height="34" aria-label="Variku vahtraleht"><path d={MAPLE} /></svg>
         <h1>Levelup</h1>
         <span className="badge">{live ? "Stuudium" : "Demo"}</span>
+        <Pomodoro />
+        <button className="chip" onClick={() => setTheme(theme === "auto" ? "light" : theme === "light" ? "dark" : "auto")} title="Teema: auto, hele, tume">{theme === "auto" ? "🌗" : theme === "light" ? "☀️" : "🌙"}</button>
+        <button className="ghost" onClick={() => { setAnimOn(!anim); setAnim(!anim); }} title="Animatsioon">{anim ? "🍂" : "⏸"}</button>
       </header>
 
-      <label className="card">
+      <label className="card" style={{ display: "block" }}>
         <b>Impordi Stuudiumi lehed (HTML)</b>
         <input type="file" accept=".html,.htm" multiple onChange={onImport} />
         <small>Ülevaade, Kokkuvõtvad hinded ja Kalender. Andmed jäävad sinu seadmesse.</small>
@@ -74,6 +92,7 @@ export default function App() {
         {tab === "Hinded" && <Grades data={data} />}
         {tab === "Tunniplaan" && <Planner data={data} />}
         {tab === "Kalender" && <CalendarSync data={data} />}
+        <Decor season={season} />
       </main>
 
       <nav>
