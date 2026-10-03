@@ -1,4 +1,5 @@
 import type { StuudiumData } from "./types";
+import { done } from "./seen";
 
 export type Severity = 3 | 2 | 1; // 3 = kiire, 2 = oluline, 1 = info
 export type AttentionItem = { severity: Severity; kind: string; title: string; detail: string; date: string };
@@ -32,7 +33,7 @@ export function attention(data: StuudiumData, today = new Date().toISOString().s
 
   const week = new Date(Date.parse(today) + 7 * 864e5).toISOString().slice(0, 10);
   for (const h of data.homework) {
-    if (h.done) continue;
+    if (h.done || done.has(h.id)) continue;
     if (h.due < today) items.push({ severity: 2, kind: "Tähtaeg möödas", title: h.subject, detail: h.text, date: h.due });
     else if (h.text.startsWith("Kontrolltöö") && h.due <= week) items.push({ severity: 2, kind: "Kontrolltöö", title: h.subject, detail: h.text.replace("Kontrolltöö: ", ""), date: h.due });
   }

@@ -34,11 +34,14 @@ const demo: StuudiumData = {
     room: room as string,
   })),
   homework: [
-    { subject: "Matemaatika", text: "Ül. 45-48, lk 112", due: d(1) },
-    { subject: "Eesti keel", text: "Kirjand 'Minu suvi'", due: d(3) },
-    { subject: "Bioloogia", text: "Õppida peatükk 5", due: d(5) },
+    { id: "h1", subject: "Matemaatika", text: "Ül. 45-48, lk 112", due: d(1) },
+    { id: "h2", subject: "Eesti keel", text: "Kirjand 'Minu suvi'", due: d(3) },
+    { id: "h3", subject: "Bioloogia", text: "Õppida peatükk 5", due: d(5) },
   ],
   remarks: [],
+  posts: [{ id: "p1", title: "Ekskursiooni info uuendatud", author: "Klassijuhataja", date: d(-1), text: "Buss väljub 8:00.", fromClassTeacher: true }],
+  classNotes: [],
+  classTeacher: "Klassijuhataja",
   summary: [{ subject: "Matemaatika", years: [{ year: "4b (25/26)", periods: ["4", "3", "4"], final: "4" }] }],
   events: [
     { id: "s1", title: "Kooli sügisbänd", start: d(6), allDay: true, scope: "school" },

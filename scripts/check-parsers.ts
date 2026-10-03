@@ -16,3 +16,6 @@ const remarks = parseRemarks(doc(dash), 2026);
 const data: any = { grades: parseDashboardGrades(doc(dash), 2026), remarks, homework: parseTodos(doc(dash)).map((t) => ({ ...t, text: (t.isTest ? "Kontrolltöö: " : "") + t.text })) };
 console.log("REMARKS", remarks.length, remarks.map((r) => `${r.kind}|${r.subject}|${r.excused}|${r.hasGrade}|${r.text.slice(0, 40)}`));
 console.log("ATTENTION", attention(data, "2026-10-03").map((i) => `${i.severity} ${i.kind} ${i.title} ${i.date} :: ${i.detail.slice(0, 50)}`));
+
+import { parseClassNotes } from "../src/data/parsers";
+console.log("CLASSNOTES", parseClassNotes(doc(dash), 2026).map((n) => `${n.date} ${n.text.slice(0, 50)} | ${n.homework?.slice(0, 30)} ${n.homeworkDue}`));

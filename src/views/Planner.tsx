@@ -1,3 +1,4 @@
+import Homework from "./Homework";
 import type { StuudiumData } from "../data/types";
 
 const days = ["E", "T", "K", "N", "R"];
@@ -18,10 +19,7 @@ export default function Planner({ data }: { data: StuudiumData }) {
           </div>
         ))}
       </section>
-      <section className="card">
-        <h2>Kodused tööd</h2>
-        {data.homework.map((h, i) => <p key={i}><b>{h.due.slice(5)}</b> {h.subject}: {h.text}</p>)}
-      </section>
+      <Homework data={data} />
     </>
   );
 }

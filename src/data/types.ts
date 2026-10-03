@@ -16,6 +16,7 @@ export type Lesson = {
 };
 
 export type Homework = {
+  id: string;
   subject: string;
   text: string;
   due: string; // ISO
@@ -36,6 +37,12 @@ export type Remark = {
   hasGrade: boolean; // kui hinne on olemas, on kommentaar tõenäoliselt hinde selgitus, mitte märkus
 };
 
+/** Suhtluse postitus (klassijuhataja, kooli töötajad). */
+export type Post = { id: string; title: string; author: string; date: string; text: string; fromClassTeacher: boolean };
+
+/** Klassijuhataja tunni ("Klassijuhatamine") märkmed ja kodutöö dashboardilt. */
+export type ClassNote = { id: string; date: string; text: string; homework?: string; homeworkDue?: string };
+
 export type Absence = { date: string; subject: string; excused: boolean };
 
 export type CalEvent = {
@@ -53,6 +60,9 @@ export type StuudiumData = {
   events: CalEvent[];
   summary: SummaryRow[];
   remarks: Remark[];
+  posts: Post[];
+  classNotes: ClassNote[];
+  classTeacher?: string;
   student: string;
   grades: Grade[];
   schedule: Lesson[];

@@ -21,3 +21,4 @@ nav button.on { color:var(--accent); font-weight:700; }
 .pad { padding:24px; }
 .primary{padding:10px 16px;border-radius:10px;border:0;background:var(--accent);color:#fff;font-size:16px}.primary:disabled{opacity:.4}
 .att{padding:6px 10px;margin:6px 0}
+.badge.new{background:#d33;margin-right:4px}.teacher{border:2px solid var(--accent)}

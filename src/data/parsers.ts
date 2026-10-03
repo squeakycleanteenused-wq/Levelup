@@ -1,4 +1,4 @@
-import type { Absence, CalEvent, Grade, Homework, Remark, SummaryRow } from "./types";
+import type { ClassNote, Absence, CalEvent, Grade, Homework, Remark, SummaryRow } from "./types";
 
 /**
  * Parserid on kirjutatud päris Stuudiumi lehtede (lapsevanema vaade, variku.ope.ee) järgi.
@@ -138,6 +138,27 @@ export function parseRemarks(doc: Document, year: number): Remark[] {
     });
     const note = txt(e.querySelector(".ng-notes"));
     if (note) out.push({ ...base, kind: "märkus", text: note });
+  });
+  return out;
+}
+
+/** "Klassijuhatamine" tundide märkmed ja kodutööd päeva kaupa (klassijuhataja info dashboardil). */
+export function parseClassNotes(doc: Document, year: number): ClassNote[] {
+  const out: ClassNote[] = [];
+  doc.querySelectorAll(".daily-summaries-segment").forEach((seg) => {
+    const date = eeDate(txt(seg.querySelector(".daily-summaries-segment-heading")), year) ?? "";
+    seg.querySelectorAll(".daily-summaries-segment-block-lesson").forEach((l) => {
+      if (!/klassijuhatamine/i.test(txt(l.querySelector(".daily-summaries-segment-lesson-subject")))) return;
+      const hw = l.querySelector(".daily-summaries-segment-lesson-homework-contents");
+      const hwText = txt(hw).replace(/^Kodutöö tähtajaga[^:]*:\s*/, "");
+      out.push({
+        id: l.getAttribute("data-ds-lesson") ?? `${date}-cl`,
+        date,
+        text: txt(l.querySelector(".daily-summaries-segment-lesson-notes")),
+        homework: hwText || undefined,
+        homeworkDue: hw ? eeDate(txt(hw.querySelector("strong")), year) ?? undefined : undefined,
+      });
+    });
   });
   return out;
 }
