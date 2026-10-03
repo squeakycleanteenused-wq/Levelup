@@ -9,6 +9,7 @@ import Falling from "./views/Falling";
 import { MAPLE, applyTheme, getAnimOn, getTheme, seasonOf, setAnimOn } from "./theme";
 import Room from "./views/Room";
 import { getSettings, saveSettings, type Role } from "./data/settings";
+import Sync from "./views/Sync";
 import Chat from "./views/Chat";
 import Posts from "./views/Posts";
 import Attention from "./views/Attention";
@@ -80,6 +81,7 @@ export default function App() {
         <input type="file" accept=".html,.htm" multiple onChange={onImport} />
         <small>Ülevaade, Hinded, Kalender, Suhtlus, Jututuba. Andmed jäävad sinu seadmesse.</small>
       </label>
+      <Sync data={data} onLoad={setData} />
       <div className="card">
         <small>Kasutan äppi:</small>{" "}
         <button className={"chip" + (role === "vanem" ? " on" : "")} onClick={() => pickRole("vanem")}>Vanem</button>{" "}

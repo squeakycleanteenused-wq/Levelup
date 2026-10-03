@@ -1,0 +1,14 @@
+{
+  "name": "Levelup",
+  "short_name": "Levelup",
+  "description": "Stuudiumi parem vaade: tähelepanu, kodused tööd, klassijuhataja info",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fbf1e2",
+  "theme_color": "#c2410c",
+  "lang": "et",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

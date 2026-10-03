@@ -8,7 +8,7 @@ const anon = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 export const chatConfigured = !!(url && anon);
 
 let client: SupabaseClient | null = null;
-const sb = () => (client ??= createClient(url!, anon!, { auth: { persistSession: false } }));
+export const sb = () => (client ??= createClient(url!, anon!, { auth: { persistSession: false } }));
 
 type Row = { id: string; iv: string; data: string; created_at: string };
 async function open(keys: ChatKeys, r: Row): Promise<ChatMsg | null> {
