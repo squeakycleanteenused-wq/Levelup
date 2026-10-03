@@ -1,6 +1,6 @@
 import type { StuudiumData } from "./types";
 import { getSettings } from "./settings";
-import { parseCalendar, parseRemarks, parseClassNotes, parsePosts, parseGradeGrid, parseDashboardGrades, parseSummary, parseTodos } from "./parsers";
+import { parseCalendar, parseRemarks, parseClassNotes, parseChatRoom, parsePosts, parseGradeGrid, parseDashboardGrades, parseSummary, parseTodos } from "./parsers";
 
 /** Loeb kasutaja salvestatud Stuudiumi lehti (HTML) ja ehitab nendest andmed. Kõik jääb seadmesse. */
 export async function importPages(files: File[], base: StuudiumData): Promise<StuudiumData> {
@@ -23,6 +23,7 @@ export async function importPages(files: File[], base: StuudiumData): Promise<St
       data.remarks = grid.remarks;
       data.cells = grid.cells;
     }
+    if (doc.querySelector(".chat-room-messages")) data.room = parseChatRoom(doc) ?? undefined;
     if (doc.querySelector(".post-in-list")) {
       const st = getSettings();
       const found = parsePosts(doc, year, st.classTeacher, st.className);

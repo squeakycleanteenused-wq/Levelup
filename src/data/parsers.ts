@@ -1,4 +1,4 @@
-import type { Post, ClassNote, LessonCell, Absence, CalEvent, Grade, Homework, Remark, SummaryRow } from "./types";
+import type { ChatRoom, Post, ClassNote, LessonCell, Absence, CalEvent, Grade, Homework, Remark, SummaryRow } from "./types";
 
 /**
  * Parserid on kirjutatud päris Stuudiumi lehtede (lapsevanema vaade, variku.ope.ee) järgi.
@@ -283,4 +283,22 @@ export function parsePosts(doc: Document, year: number, teacher: string, classNa
     });
   });
   return out;
+}
+
+/** /chat/g/<id>: klassi jututuba (laste vestlus). */
+export function parseChatRoom(doc: Document): ChatRoom | null {
+  const room = doc.querySelector(".chat-room");
+  if (!room) return null;
+  return {
+    title: txt(room.querySelector(".chat-room-main .chat-room-title")) || txt(room.querySelector(".chat-room-title")),
+    canSend: room.getAttribute("data-chat-can-send-messages") === "1",
+    messages: [...room.querySelectorAll(".chat-room-messages .msg[data-id]")].map((m) => ({
+      id: m.getAttribute("data-id")!,
+      userId: m.getAttribute("data-u") ?? "",
+      name: m.getAttribute("data-un") ?? txt(m.querySelector(".mu")),
+      date: m.getAttribute("data-dt") ?? "",
+      time: txt(m.querySelector(".mts")),
+      text: txt(m.querySelector(".msg-msg")),
+    })),
+  };
 }

@@ -61,6 +61,10 @@ export type Post = {
 /** Klassijuhataja tunni ("Klassijuhatamine") märkmed ja kodutöö dashboardilt. */
 export type ClassNote = { id: string; date: string; text: string; homework?: string; homeworkDue?: string };
 
+/** Klassi jututuba (Stuudiumi /chat/g/<id>). Lapsevanemana saab lugeda, kirjutada mitte. */
+export type RoomMsg = { id: string; userId: string; name: string; date: string; time: string; text: string };
+export type ChatRoom = { title: string; canSend: boolean; messages: RoomMsg[] };
+
 export type Absence = { date: string; subject: string; excused: boolean };
 
 export type CalEvent = {
@@ -80,6 +84,7 @@ export type StuudiumData = {
   remarks: Remark[];
   posts: Post[];
   cells: LessonCell[];
+  room?: ChatRoom;
   classNotes: ClassNote[];
   classTeacher?: string;
   className?: string;

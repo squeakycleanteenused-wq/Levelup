@@ -19,3 +19,9 @@ console.log("ATTENTION", attention(data, "2026-10-03").map((i) => `${i.severity}
 
 import { parseClassNotes } from "../src/data/parsers";
 console.log("CLASSNOTES", parseClassNotes(doc(dash), 2026).map((n) => `${n.date} ${n.text.slice(0, 50)} | ${n.homework?.slice(0, 30)} ${n.homeworkDue}`));
+
+import { parseChatRoom } from "../src/data/parsers";
+if (process.argv[5]) {
+  const r = parseChatRoom(doc(process.argv[5]));
+  console.log("ROOM", r?.title, "canSend", r?.canSend, "messages", r?.messages.length, "authors", new Set(r?.messages.map((m) => m.userId)).size, "dates", [...new Set(r?.messages.map((m) => m.date))].length);
+}

@@ -7,6 +7,8 @@ import Decor from "./views/Decor";
 import Pomodoro from "./views/Pomodoro";
 import Falling from "./views/Falling";
 import { MAPLE, applyTheme, getAnimOn, getTheme, seasonOf, setAnimOn } from "./theme";
+import Room from "./views/Room";
+import { getSettings, saveSettings, type Role } from "./data/settings";
 import Chat from "./views/Chat";
 import Posts from "./views/Posts";
 import Attention from "./views/Attention";
@@ -15,7 +17,7 @@ import Grades from "./views/Grades";
 import Planner from "./views/Planner";
 import CalendarSync from "./views/CalendarSync";
 
-const tabs = ["Avaleht", "Postitused", "Tähelepanu", "Hinded", "Tunniplaan", "Kalender", "Chat"] as const;
+const tabs = ["Avaleht", "Postitused", "Tähelepanu", "Hinded", "Tunniplaan", "Kalender", "Jututuba", "Vanemad"] as const;
 type Tab = (typeof tabs)[number];
 
 export default function App() {
@@ -24,6 +26,9 @@ export default function App() {
   const [live, setLive] = useState(false);
   const [error, setError] = useState("");
   const season = seasonOf();
+  const [role, setRole] = useState<Role>(getSettings().role);
+  const visibleTabs = tabs.filter((t) => role === "vanem" || t !== "Vanemad");
+  const pickRole = (r: Role) => { setRole(r); saveSettings({ ...getSettings(), role: r }); if (r === "õpilane" && tab === "Vanemad") setTab("Avaleht"); };
   const [anim, setAnim] = useState(getAnimOn() && !matchMedia("(prefers-reduced-motion: reduce)").matches);
 
   const [theme, setTheme] = useState(getTheme());
@@ -73,8 +78,14 @@ export default function App() {
       <label className="card" style={{ display: "block" }}>
         <b>Impordi Stuudiumi lehed (HTML)</b>
         <input type="file" accept=".html,.htm" multiple onChange={onImport} />
-        <small>Ülevaade, Kokkuvõtvad hinded ja Kalender. Andmed jäävad sinu seadmesse.</small>
+        <small>Ülevaade, Hinded, Kalender, Suhtlus, Jututuba. Andmed jäävad sinu seadmesse.</small>
       </label>
+      <div className="card">
+        <small>Kasutan äppi:</small>{" "}
+        <button className={"chip" + (role === "vanem" ? " on" : "")} onClick={() => pickRole("vanem")}>Vanem</button>{" "}
+        <button className={"chip" + (role === "õpilane" ? " on" : "")} onClick={() => pickRole("õpilane")}>Õpilane</button>
+        {role === "õpilane" && <div><small>Vanemate chat on õpilasvaates peidus.</small></div>}
+      </div>
 
       {!live && isTauri() && (
         <form className="card login" onSubmit={connect}>
@@ -92,13 +103,14 @@ export default function App() {
         {tab === "Tähelepanu" && <Attention data={data} />}
         {tab === "Hinded" && <Grades data={data} />}
         {tab === "Tunniplaan" && <Planner data={data} />}
-        {tab === "Chat" && <Chat />}
+        {tab === "Jututuba" && <Room data={data} />}
+        {tab === "Vanemad" && role === "vanem" && <Chat />}
         {tab === "Kalender" && <CalendarSync data={data} />}
         <Decor season={season} />
       </main>
 
       <nav>
-        {tabs.map((t) => (
+        {visibleTabs.map((t) => (
           <button key={t} className={t === tab ? "on" : ""} onClick={() => setTab(t)}>
             {t}
           </button>
