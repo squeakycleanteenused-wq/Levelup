@@ -23,7 +23,19 @@ export type Homework = {
 
 export type Absence = { date: string; subject: string; excused: boolean };
 
+export type CalEvent = {
+  id: string; // püsiv Stuudiumi id, et uuesti importimine uuendaks, mitte dubleeriks
+  title: string;
+  start: string; // ISO kuupäev või kuupäev+kellaaeg
+  end?: string;
+  allDay?: boolean;
+  place?: string;
+  scope: "school" | "class";
+  className?: string; // nt "7.A", kui scope = "class"
+};
+
 export type StuudiumData = {
+  events: CalEvent[];
   student: string;
   grades: Grade[];
   schedule: Lesson[];

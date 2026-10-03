@@ -5,8 +5,9 @@ import { isTauri, login, stuudiumSource } from "./data/stuudium";
 import Home from "./views/Home";
 import Grades from "./views/Grades";
 import Planner from "./views/Planner";
+import CalendarSync from "./views/CalendarSync";
 
-const tabs = ["Avaleht", "Hinded", "Tunniplaan"] as const;
+const tabs = ["Avaleht", "Hinded", "Tunniplaan", "Kalender"] as const;
 type Tab = (typeof tabs)[number];
 
 export default function App() {
@@ -55,6 +56,7 @@ export default function App() {
         {tab === "Avaleht" && <Home data={data} />}
         {tab === "Hinded" && <Grades data={data} />}
         {tab === "Tunniplaan" && <Planner data={data} />}
+        {tab === "Kalender" && <CalendarSync data={data} />}
       </main>
 
       <nav>

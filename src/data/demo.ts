@@ -37,6 +37,13 @@ const demo: StuudiumData = {
     { subject: "Eesti keel", text: "Kirjand 'Minu suvi'", due: d(3) },
     { subject: "Bioloogia", text: "Õppida peatükk 5", due: d(5) },
   ],
+  events: [
+    { id: "s1", title: "Kooli sügisbänd", start: d(6), allDay: true, scope: "school" },
+    { id: "s2", title: "Lastevanemate koosolek", start: d(9) + "T18:00", end: d(9) + "T19:30", place: "Aula", scope: "school" },
+    { id: "c1", title: "Klassiekskursioon", start: d(12), allDay: true, scope: "class", className: "7.A" },
+    { id: "c2", title: "Kontrolltöö: matemaatika", start: d(4) + "T09:10", end: d(4) + "T09:55", scope: "class", className: "7.A" },
+    { id: "c3", title: "Klassiõhtu", start: d(15) + "T17:00", scope: "class", className: "7.B" },
+  ],
   absences: [
     { date: d(-12), subject: "Matemaatika", excused: true },
     { date: d(-4), subject: "Ajalugu", excused: false },

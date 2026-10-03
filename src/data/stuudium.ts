@@ -38,6 +38,6 @@ function parseGrades(doc: Document): Grade[] {
 export const stuudiumSource: DataSource = {
   async load(): Promise<StuudiumData> {
     const grades = parseGrades(await page("/diary/grades")); // PLACEHOLDER tee
-    return { student: "", grades, schedule: [], homework: [], absences: [] };
+    return { student: "", grades, schedule: [], events: [], homework: [], absences: [] };
   },
 };
