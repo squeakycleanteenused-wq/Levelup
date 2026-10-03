@@ -1,6 +1,7 @@
 import type { StuudiumData } from "../data/types";
 import Attention from "./Attention";
 import ClassTeacher from "./ClassTeacher";
+import { ClassPosts } from "./Posts";
 import Homework from "./Homework";
 import { avg } from "../data/stats";
 
@@ -11,6 +12,7 @@ export default function Home({ data }: { data: StuudiumData }) {
 
   return (
     <>
+    <ClassPosts data={data} limit={4} />
     <ClassTeacher data={data} />
     <Attention data={data} limit={5} />
     <Homework data={data} limit={6} />

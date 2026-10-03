@@ -42,7 +42,21 @@ export type Remark = {
 };
 
 /** Suhtluse postitus (klassijuhataja, kooli töötajad). */
-export type Post = { id: string; title: string; author: string; date: string; text: string; fromClassTeacher: boolean };
+export type PostComment = { author: string; date: string; text: string };
+export type Post = {
+  id: string;
+  title: string;
+  author: string;
+  created: string; // ISO kuupäev, millal postitus tehti
+  activity: string; // ISO kuupäev, millal viimati midagi juhtus (muudatus või vastus)
+  updated: boolean; // activity > created: postitust on uuendatud
+  text: string;
+  audience: string[]; // nt ["5b vanemad ja õpetaja"] või ["Kogu kool"]
+  commentCount: number;
+  comments: PostComment[]; // täis ainult siis, kui postituse enda leht on imporditud
+  fromClassTeacher: boolean;
+  forMyClass: boolean;
+};
 
 /** Klassijuhataja tunni ("Klassijuhatamine") märkmed ja kodutöö dashboardilt. */
 export type ClassNote = { id: string; date: string; text: string; homework?: string; homeworkDue?: string };
@@ -68,6 +82,7 @@ export type StuudiumData = {
   cells: LessonCell[];
   classNotes: ClassNote[];
   classTeacher?: string;
+  className?: string;
   student: string;
   grades: Grade[];
   schedule: Lesson[];

@@ -1,4 +1,4 @@
-import type { ClassNote, LessonCell, Absence, CalEvent, Grade, Homework, Remark, SummaryRow } from "./types";
+import type { Post, ClassNote, LessonCell, Absence, CalEvent, Grade, Homework, Remark, SummaryRow } from "./types";
 
 /**
  * Parserid on kirjutatud päris Stuudiumi lehtede (lapsevanema vaade, variku.ope.ee) järgi.
@@ -217,4 +217,67 @@ export function parseGradeGrid(doc: Document): { grades: Grade[]; remarks: Remar
     });
   });
   return { grades, remarks, cells };
+}
+
+const shortMonths = ["jaan", "veebr", "märts", "apr", "mai", "juuni", "juuli", "aug", "sept", "okt", "nov", "dets"];
+/** "2. okt kell 15:38" -> "2026-10-02" */
+function postDate(text: string, year: number): string {
+  const m = text.match(/(\d{1,2})\.\s*([a-zäöõü]+)/i);
+  const mi = m ? shortMonths.findIndex((x) => m[2].toLowerCase().startsWith(x)) : -1;
+  if (!m || mi < 0) return "";
+  const iso = `${year}-${String(mi + 1).padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+  // Stuudium ei näita aastat: tulevikku jääv kuupäev kuulub eelmisesse aastasse
+  return iso > new Date(Date.now() + 864e5).toISOString().slice(0, 10) ? `${year - 1}${iso.slice(4)}` : iso;
+}
+/** Postituste nimekirja kuupäevapealkiri "02.10" / "29.9" -> ISO */
+function dividerDate(text: string, year: number): string {
+  const m = text.match(/(\d{1,2})\.(\d{1,2})/);
+  return m ? `${year}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}` : "";
+}
+
+/**
+ * /suhtlus/ (postkast) ja /suhtlus/p/<id> (üks postitus koos vastustega).
+ * Nimekirja kuupäevapealkiri = viimane tegevus; kui see on hilisem kui loomise kuupäev, on postitust uuendatud.
+ */
+export function parsePosts(doc: Document, year: number, teacher: string, className: string): Post[] {
+  const out: Post[] = [];
+  const cls = className.toLowerCase().replace(/\s|\./g, "");
+  let divider = "";
+  const root = doc.querySelector(".post-list-posts") ?? doc;
+  root.querySelectorAll(".post-list-date-divider, .post-in-list").forEach((el) => {
+    if (el.classList.contains("post-list-date-divider")) {
+      divider = dividerDate(txt(el), year);
+      return;
+    }
+    if (el.classList.contains("post-is-merged-hidden")) return;
+    const id = el.getAttribute("data-post-id");
+    if (!id) return;
+    const author = txt(el.querySelector(".post-author"));
+    const created = postDate(txt(el.querySelector(".post-date")), year);
+    const audience = [...el.querySelectorAll(".post-participants-summary .bl-p")].map((x) => txt(x)).filter((x) => x && x !== "…");
+    const comments = [...el.querySelectorAll(".post-comment[data-comment-id]")].map((c) => ({
+      author: txt(c.querySelector(".comment-author")),
+      date: postDate(txt(c.querySelector(".comment-date")), year),
+      text: txt(c.querySelector(".comment-body")),
+    }));
+    const count = Number(txt(el.querySelector(".post-comments-summary")).match(/\d+/)?.[0] ?? comments.length);
+    const lastComment = comments.map((c) => c.date).sort().pop() ?? "";
+    const activity = [divider, lastComment, created].filter(Boolean).sort().pop() ?? created;
+    const forMyClass = audience.some((a) => a.toLowerCase().replace(/\s|\./g, "").startsWith(cls));
+    out.push({
+      id,
+      title: txt(el.querySelector(".post-title-main")),
+      author,
+      created,
+      activity,
+      updated: activity > created,
+      text: (el.querySelector(".post-body.formatted-text")?.innerHTML ?? "").replace(/<br\s*\/?>/gi, "\n").replace(/<[^>]+>/g, "").replace(/[ \t]+/g, " ").trim(),
+      audience,
+      commentCount: count,
+      comments,
+      fromClassTeacher: author === teacher,
+      forMyClass,
+    });
+  });
+  return out;
 }

@@ -16,7 +16,7 @@ input,.login button { padding:10px; border-radius:10px; border:1px solid #8885; 
 .login button { background:var(--accent); color:#fff; border:0; }
 .err { color:#d33; }
 nav { position:fixed; bottom:0; left:0; right:0; display:flex; background:var(--card); padding-bottom:env(safe-area-inset-bottom); border-top:1px solid #8883; }
-nav button { flex:1; padding:16px; background:none; border:0; color:var(--fg); font-size:15px; }
+nav button { flex:1; padding:14px 2px; background:none; border:0; color:var(--fg); font-size:13px; }
 nav button.on { color:var(--accent); font-weight:700; }
 .pad { padding:24px; }
 .primary{padding:10px 16px;border-radius:10px;border:0;background:var(--accent);color:#fff;font-size:16px}.primary:disabled{opacity:.4}

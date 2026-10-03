@@ -1,5 +1,6 @@
 import type { StuudiumData } from "./types";
-import { parseCalendar, parseRemarks, parseClassNotes, parseGradeGrid, parseDashboardGrades, parseSummary, parseTodos } from "./parsers";
+import { getSettings } from "./settings";
+import { parseCalendar, parseRemarks, parseClassNotes, parsePosts, parseGradeGrid, parseDashboardGrades, parseSummary, parseTodos } from "./parsers";
 
 /** Loeb kasutaja salvestatud Stuudiumi lehti (HTML) ja ehitab nendest andmed. Kõik jääb seadmesse. */
 export async function importPages(files: File[], base: StuudiumData): Promise<StuudiumData> {
@@ -21,6 +22,19 @@ export async function importPages(files: File[], base: StuudiumData): Promise<St
       data.grades = grid.grades;
       data.remarks = grid.remarks;
       data.cells = grid.cells;
+    }
+    if (doc.querySelector(".post-in-list")) {
+      const st = getSettings();
+      const found = parsePosts(doc, year, st.classTeacher, st.className);
+      // sama postitus eri lehtedelt (nimekiri + üksik leht): ühenda, jäta alles rohkem vastuseid
+      const byId = new Map(data.posts.map((p) => [p.id, p]));
+      found.forEach((p) => {
+        const old = byId.get(p.id);
+        byId.set(p.id, old && old.comments.length > p.comments.length ? { ...p, comments: old.comments, activity: old.activity > p.activity ? old.activity : p.activity, updated: old.updated || p.updated } : p);
+      });
+      data.posts = [...byId.values()];
+      data.classTeacher = st.classTeacher;
+      data.className = st.className;
     }
     if (doc.querySelector(".suhtlus-calendar, .cal-day")) data.events = parseCalendar(doc);
   }
