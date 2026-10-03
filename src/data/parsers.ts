@@ -219,6 +219,9 @@ export function parseGradeGrid(doc: Document): { grades: Grade[]; remarks: Remar
   return { grades, remarks, cells };
 }
 
+/** Nimi sobib eesnime järgi ("Olena" leiab "Olena Shanina"), tõstutundetult. */
+const hasName = (text: string, name: string) => !!name && new RegExp(`(^|\\s)${name.trim()}(\\s|$)`, "i").test(text);
+
 const shortMonths = ["jaan", "veebr", "märts", "apr", "mai", "juuni", "juuli", "aug", "sept", "okt", "nov", "dets"];
 /** "2. okt kell 15:38" -> "2026-10-02" */
 function postDate(text: string, year: number): string {
@@ -275,7 +278,7 @@ export function parsePosts(doc: Document, year: number, teacher: string, classNa
       audience,
       commentCount: count,
       comments,
-      fromClassTeacher: author === teacher,
+      fromClassTeacher: hasName(author, teacher) || audience.some((a) => hasName(a, teacher)),
       forMyClass,
     });
   });

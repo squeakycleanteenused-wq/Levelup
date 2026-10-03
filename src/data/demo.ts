@@ -42,7 +42,7 @@ const demo: StuudiumData = {
   cells: [],
   posts: [{ id: "p1", title: "Ekskursiooni info uuendatud", author: "Klassijuhataja", created: d(-3), activity: d(-1), updated: true, text: "Buss väljub 8:00.", audience: ["5b vanemad ja õpetaja"], commentCount: 0, comments: [], fromClassTeacher: true, forMyClass: true }],
   classNotes: [],
-  classTeacher: "Klassijuhataja",
+  classTeacher: "Olena",
   className: "5b",
   summary: [{ subject: "Matemaatika", years: [{ year: "4b (25/26)", periods: ["4", "3", "4"], final: "4" }] }],
   events: [

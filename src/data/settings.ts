@@ -1,7 +1,7 @@
-/** Kasutaja seaded (klass ja klassijuhataja). Vaikimisi 5b ja Olena Shanina. */
+/** Kasutaja seaded (klass ja klassijuhataja). Vaikimisi 5b ja Olena (tuvastatakse eesnime järgi). */
 const KEY = "settings";
 export type Settings = { className: string; classTeacher: string };
-const defaults: Settings = { className: "5b", classTeacher: "Olena Shanina" };
+const defaults: Settings = { className: "5b", classTeacher: "Olena" };
 
 export function getSettings(): Settings {
   try {
