@@ -28,7 +28,7 @@ export type YearSummary = { year: string; periods: string[]; final?: string };
 export type SummaryRow = { subject: string; years: YearSummary[] };
 
 /** Tabeli lahter: ainetunni teema ja kodutöö ühel päeval. */
-export type LessonCell = { subject: string; date: string; topics: string[]; homework: string[] };
+export type LessonCell = { subject: string; date: string; topics: string[]; homework: { due: string; text: string }[] };
 
 /** Hinde-/tunnikirje märge: puudumine, hilinemine, tegemata töö, õpetaja märkus. */
 export type Remark = {

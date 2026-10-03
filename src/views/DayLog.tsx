@@ -23,7 +23,7 @@ export default function DayLog({ data }: { data: StuudiumData }) {
                 <b>{icon[r.kind]}</b> {r.subject}: {r.text}
               </div>
             ))}
-            {hw.map((c, i) => <div key={i}><small>Kodutöö · {c.subject}: {c.homework.join(" ")}</small></div>)}
+            {hw.flatMap((c) => c.homework.map((h, j) => <div key={c.subject + j}><small>📚 <b>{c.subject}</b>{h.due ? ` (tähtaeg ${h.due})` : ""}: {h.text}</small></div>))}
           </div>
         );
       })}

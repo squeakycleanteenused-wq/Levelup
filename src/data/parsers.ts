@@ -185,7 +185,14 @@ export function parseGradeGrid(doc: Document): { grades: Grade[]; remarks: Remar
         return txt(c);
       };
       const topics = [...td.querySelectorAll(".lesson_notes")].map(noteOf).filter(Boolean);
-      const homework = [...td.querySelectorAll(".lesson_homework")].map((h) => txt(h)).filter(Boolean);
+      const homework = [...td.querySelectorAll(".lesson_homework")]
+        .map((h) => {
+          const c = h.cloneNode(true) as Element;
+          const due = txt(c.querySelector("strong b")); // "05.10"
+          c.querySelector("strong")?.remove(); // "Kodutöö 05.10:" on juba kirjas, ei korda
+          return { due, text: txt(c) };
+        })
+        .filter((x) => x.text);
       const cell: LessonCell = { subject, date, topics, homework };
       const added = new Set<string>();
       const add = (r: Remark) => {
