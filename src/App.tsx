@@ -12,6 +12,8 @@ import Homework from "./views/Homework";
 import Attention from "./views/Attention";
 import { ClassPosts } from "./views/Posts";
 import Chat from "./views/Chat";
+import Points from "./views/Points";
+import type { ChatKeys } from "./data/chatCrypto";
 import Unlock from "./views/Unlock";
 
 const get = (k: string) => { try { return localStorage.getItem(k) ?? ""; } catch { return ""; } };
@@ -20,7 +22,8 @@ const password = () => get("familyPw") || (import.meta.env.DEV ? ((import.meta.e
 
 export default function App() {
   const season = seasonOf();
-  const [tab, setTab] = useState<"home" | "chat">("home");
+  const [tab, setTab] = useState<"home" | "points" | "chat">("home");
+  const [keys, setKeys] = useState<ChatKeys | null>(null);
   const [data, setData] = useState<StuudiumData | null>(() => { try { return JSON.parse(get("data")) as StuudiumData; } catch { return null; } });
   const [updated, setUpdated] = useState(get("updatedAt"));
   const [pw, setPw] = useState(password());
@@ -54,6 +57,8 @@ export default function App() {
     return () => { stop = true; clearInterval(t); };
   }, [pw]);
 
+  useEffect(() => { if (pw) deriveKeys(pw).then(setKeys); else setKeys(null); }, [pw]);
+
   const unlock = (p: string) => { put("familyPw", p); setPw(p); };
   const when = updated ? new Date(updated).toLocaleString("et-EE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
 
@@ -86,10 +91,12 @@ export default function App() {
           <Decor season={season} />
         </main>
       )}
+      {tab === "points" && <main><Points data={data} keys={keys} /></main>}
       {tab === "chat" && <main><Chat /></main>}
 
       <nav>
         <button className={tab === "home" ? "on" : ""} onClick={() => setTab("home")}>Avaleht</button>
+        <button className={tab === "points" ? "on" : ""} onClick={() => setTab("points")}>Punktid</button>
         <button className={tab === "chat" ? "on" : ""} onClick={() => setTab("chat")}>Vanemate chat</button>
       </nav>
     </div>
