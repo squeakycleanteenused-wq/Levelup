@@ -25,6 +25,17 @@ export type Homework = {
 export type YearSummary = { year: string; periods: string[]; final?: string };
 export type SummaryRow = { subject: string; years: YearSummary[] };
 
+/** Hinde-/tunnikirje märge: puudumine, hilinemine, tegemata töö, õpetaja märkus. */
+export type Remark = {
+  subject: string;
+  date: string;
+  kind: "puudumine" | "hilinemine" | "tegemata töö" | "märkus" | "muu";
+  text: string; // õpetaja kommentaar või märke tekst
+  teacher?: string;
+  excused?: boolean;
+  hasGrade: boolean; // kui hinne on olemas, on kommentaar tõenäoliselt hinde selgitus, mitte märkus
+};
+
 export type Absence = { date: string; subject: string; excused: boolean };
 
 export type CalEvent = {
@@ -41,6 +52,7 @@ export type CalEvent = {
 export type StuudiumData = {
   events: CalEvent[];
   summary: SummaryRow[];
+  remarks: Remark[];
   student: string;
   grades: Grade[];
   schedule: Lesson[];

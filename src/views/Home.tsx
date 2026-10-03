@@ -1,4 +1,5 @@
 import type { StuudiumData } from "../data/types";
+import Attention from "./Attention";
 import { avg } from "../data/stats";
 
 export default function Home({ data }: { data: StuudiumData }) {
@@ -8,6 +9,8 @@ export default function Home({ data }: { data: StuudiumData }) {
   const next = [...data.homework].sort((a, b) => a.due.localeCompare(b.due)).slice(0, 3);
 
   return (
+    <>
+    <Attention data={data} limit={5} />
     <div className="grid">
       <section className="card">
         <h2>Keskmine hinne</h2>
@@ -31,5 +34,6 @@ export default function Home({ data }: { data: StuudiumData }) {
         <small>{data.absences.filter((a) => !a.excused).length} põhjuseta</small>
       </section>
     </div>
+    </>
   );
 }

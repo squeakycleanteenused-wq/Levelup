@@ -9,3 +9,10 @@ console.log("SUMMARY", JSON.stringify(parseSummary(doc(summary)), null, 1).slice
 console.log("GRADES", parseDashboardGrades(doc(dash), 2026));
 console.log("TODOS", parseTodos(doc(dash)).slice(0, 4), "total", parseTodos(doc(dash)).length);
 console.log("CAL", parseCalendar(doc(cal)));
+
+import { parseRemarks } from "../src/data/parsers";
+import { attention } from "../src/data/attention";
+const remarks = parseRemarks(doc(dash), 2026);
+const data: any = { grades: parseDashboardGrades(doc(dash), 2026), remarks, homework: parseTodos(doc(dash)).map((t) => ({ ...t, text: (t.isTest ? "Kontrolltöö: " : "") + t.text })) };
+console.log("REMARKS", remarks.length, remarks.map((r) => `${r.kind}|${r.subject}|${r.excused}|${r.hasGrade}|${r.text.slice(0, 40)}`));
+console.log("ATTENTION", attention(data, "2026-10-03").map((i) => `${i.severity} ${i.kind} ${i.title} ${i.date} :: ${i.detail.slice(0, 50)}`));

@@ -38,6 +38,7 @@ const demo: StuudiumData = {
     { subject: "Eesti keel", text: "Kirjand 'Minu suvi'", due: d(3) },
     { subject: "Bioloogia", text: "Õppida peatükk 5", due: d(5) },
   ],
+  remarks: [],
   summary: [{ subject: "Matemaatika", years: [{ year: "4b (25/26)", periods: ["4", "3", "4"], final: "4" }] }],
   events: [
     { id: "s1", title: "Kooli sügisbänd", start: d(6), allDay: true, scope: "school" },

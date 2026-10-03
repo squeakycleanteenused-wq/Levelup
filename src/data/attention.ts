@@ -1,0 +1,41 @@
+import type { StuudiumData } from "./types";
+
+export type Severity = 3 | 2 | 1; // 3 = kiire, 2 = oluline, 1 = info
+export type AttentionItem = { severity: Severity; kind: string; title: string; detail: string; date: string };
+
+/** Märkesõnad, mis viitavad negatiivsele märkusele (muuda vastavalt vajadusele). */
+const NEGATIVE = /lohakas|unustas|ei tei|tegemata|hilines|segas|ebaviisakas|puudus (vahend|õpik|vihik)|pole kaasas|ei olnud kaasas|korrata|parandada/i;
+
+export function attention(data: StuudiumData, today = new Date().toISOString().slice(0, 10), badMax = 2): AttentionItem[] {
+  const items: AttentionItem[] = [];
+
+  for (const g of data.grades) {
+    if ((g.value !== null && g.value <= badMax) || /^MA$/i.test(g.label))
+      items.push({ severity: 3, kind: "Madal hinne", title: `${g.subject}: ${g.label}`, detail: g.kind, date: g.date });
+  }
+
+  for (const r of data.remarks) {
+    const who = r.teacher ? ` (${r.teacher})` : "";
+    if (r.kind === "puudumine") {
+      if (r.excused === false) items.push({ severity: 3, kind: "Põhjendamata puudumine", title: r.subject, detail: r.text, date: r.date });
+    } else if (r.kind === "tegemata töö") {
+      items.push({ severity: 3, kind: "Tegemata töö", title: r.subject, detail: r.text, date: r.date });
+    } else if (r.kind === "hilinemine" || r.kind === "muu") {
+      items.push({ severity: 2, kind: r.kind === "hilinemine" ? "Hilinemine" : "Märge", title: r.subject, detail: r.text, date: r.date });
+    } else if (r.kind === "märkus") {
+      const neg = NEGATIVE.test(r.text);
+      // kommentaar hinde juures või puudumise juures on selgitus, mitte märkus (v.a märkesõnad)
+      const explains = r.hasGrade || data.remarks.some((x) => x.kind === "puudumine" && x.date === r.date && x.subject === r.subject);
+      if (neg || !explains) items.push({ severity: neg ? 3 : 2, kind: "Märkus", title: `${r.subject}${who}`, detail: r.text, date: r.date });
+    }
+  }
+
+  const week = new Date(Date.parse(today) + 7 * 864e5).toISOString().slice(0, 10);
+  for (const h of data.homework) {
+    if (h.done) continue;
+    if (h.due < today) items.push({ severity: 2, kind: "Tähtaeg möödas", title: h.subject, detail: h.text, date: h.due });
+    else if (h.text.startsWith("Kontrolltöö") && h.due <= week) items.push({ severity: 2, kind: "Kontrolltöö", title: h.subject, detail: h.text.replace("Kontrolltöö: ", ""), date: h.due });
+  }
+
+  return items.sort((a, b) => b.severity - a.severity || b.date.localeCompare(a.date));
+}

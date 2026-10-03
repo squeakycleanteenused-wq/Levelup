@@ -1,4 +1,4 @@
-import type { Absence, CalEvent, Grade, Homework, SummaryRow } from "./types";
+import type { Absence, CalEvent, Grade, Homework, Remark, SummaryRow } from "./types";
 
 /**
  * Parserid on kirjutatud päris Stuudiumi lehtede (lapsevanema vaade, variku.ope.ee) järgi.
@@ -111,4 +111,33 @@ export function parseCalendar(doc: Document): CalEvent[] {
 
 export function parseAbsences(_doc: Document): Absence[] {
   return []; // õpilase puudumised pole veel näidislehel (praegu ainult õpetajate puudumised)
+}
+
+/** Märked, puudumised ja õpetajate kommentaarid, mida Stuudium peidab hindade vahele. */
+export function parseRemarks(doc: Document, year: number): Remark[] {
+  const out: Remark[] = [];
+  doc.querySelectorAll(".stream-entry").forEach((e) => {
+    const ctx = txt(e.querySelector(".stream-entry-context a"));
+    const base = {
+      subject: ctx.split(",")[0].trim(),
+      date: eeDate(ctx, year) ?? "",
+      teacher: e.querySelector(".stream-entry-avatar")?.getAttribute("data-balloon") ?? undefined,
+      hasGrade: !!e.querySelector(".grade-current"),
+    };
+    e.querySelectorAll(".grade-param").forEach((p) => {
+      const cls = p.className;
+      const label = txt(p);
+      const extra = txt(p.nextElementSibling?.classList.contains("grade-param-extra") ? p.nextElementSibling : null);
+      const unexcused = /unexcused/.test(cls) || /põhjendamata/i.test(extra);
+      const excused = !unexcused && (/excused/.test(cls) || /põhjendatud/i.test(extra));
+      const kind: Remark["kind"] = /absent/.test(cls) || /^puud/i.test(label) ? "puudumine"
+        : /late|hili/i.test(cls + label) ? "hilinemine"
+        : /kodu|tegemata|homework/i.test(cls + label) ? "tegemata töö"
+        : "muu";
+      out.push({ ...base, kind, text: [label, extra].filter(Boolean).join(": "), excused: kind === "puudumine" ? excused : undefined });
+    });
+    const note = txt(e.querySelector(".ng-notes"));
+    if (note) out.push({ ...base, kind: "märkus", text: note });
+  });
+  return out;
 }

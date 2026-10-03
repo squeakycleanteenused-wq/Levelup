@@ -3,12 +3,13 @@ import type { StuudiumData } from "./data/types";
 import { demoSource } from "./data/demo";
 import { isTauri, login, stuudiumSource } from "./data/stuudium";
 import { importPages } from "./data/importPages";
+import Attention from "./views/Attention";
 import Home from "./views/Home";
 import Grades from "./views/Grades";
 import Planner from "./views/Planner";
 import CalendarSync from "./views/CalendarSync";
 
-const tabs = ["Avaleht", "Hinded", "Tunniplaan", "Kalender"] as const;
+const tabs = ["Avaleht", "Tähelepanu", "Hinded", "Tunniplaan", "Kalender"] as const;
 type Tab = (typeof tabs)[number];
 
 export default function App() {
@@ -67,6 +68,7 @@ export default function App() {
 
       <main>
         {tab === "Avaleht" && <Home data={data} />}
+        {tab === "Tähelepanu" && <Attention data={data} />}
         {tab === "Hinded" && <Grades data={data} />}
         {tab === "Tunniplaan" && <Planner data={data} />}
         {tab === "Kalender" && <CalendarSync data={data} />}
