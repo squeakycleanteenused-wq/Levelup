@@ -39,6 +39,7 @@ const demo: StuudiumData = {
     { id: "h3", subject: "Bioloogia", text: "Õppida peatükk 5", due: d(5) },
   ],
   remarks: [],
+  cells: [],
   posts: [{ id: "p1", title: "Ekskursiooni info uuendatud", author: "Klassijuhataja", date: d(-1), text: "Buss väljub 8:00.", fromClassTeacher: true }],
   classNotes: [],
   classTeacher: "Klassijuhataja",

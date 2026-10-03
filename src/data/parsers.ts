@@ -1,4 +1,4 @@
-import type { ClassNote, Absence, CalEvent, Grade, Homework, Remark, SummaryRow } from "./types";
+import type { ClassNote, LessonCell, Absence, CalEvent, Grade, Homework, Remark, SummaryRow } from "./types";
 
 /**
  * Parserid on kirjutatud päris Stuudiumi lehtede (lapsevanema vaade, variku.ope.ee) järgi.
@@ -137,7 +137,7 @@ export function parseRemarks(doc: Document, year: number): Remark[] {
       out.push({ ...base, kind, text: [label, extra].filter(Boolean).join(": "), excused: kind === "puudumine" ? excused : undefined });
     });
     const note = txt(e.querySelector(".ng-notes"));
-    if (note) out.push({ ...base, kind: "märkus", text: note });
+    if (note) out.push({ ...base, kind: "tagasiside", text: note });
   });
   return out;
 }
@@ -161,4 +161,60 @@ export function parseClassNotes(doc: Document, year: number): ClassNote[] {
     });
   });
   return out;
+}
+
+/**
+ * /grades/student/<id>: hinnete tabel (ained x päevad).
+ * Sümbolid: H hilines, P puudus (põhjusega/põhjuseta), V vabastatud, K kodutöö tegemata,
+ * ! tähelepanu (õpetaja märkus), jutumull = õpetaja tagasiside hindele.
+ */
+export function parseGradeGrid(doc: Document): { grades: Grade[]; remarks: Remark[]; cells: LessonCell[] } {
+  const grades: Grade[] = [];
+  const remarks: Remark[] = [];
+  const cells: LessonCell[] = [];
+  doc.querySelectorAll("table.student_lessons_grades tbody tr").forEach((tr) => {
+    const subject = txt(tr.querySelector("th"));
+    tr.querySelectorAll("td.summary").forEach((td) => {
+      const ymd = /lesson_(\d{8})/.exec(td.className)?.[1];
+      if (!ymd) return;
+      const date = `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`;
+      const noteOf = (n: Element | null) => {
+        if (!n) return "";
+        const c = n.cloneNode(true) as Element;
+        c.querySelectorAll(".grade_params").forEach((x) => x.remove());
+        return txt(c);
+      };
+      const topics = [...td.querySelectorAll(".lesson_notes")].map(noteOf).filter(Boolean);
+      const homework = [...td.querySelectorAll(".lesson_homework")].map((h) => txt(h)).filter(Boolean);
+      const cell: LessonCell = { subject, date, topics, homework };
+      const added = new Set<string>();
+      const add = (r: Remark) => {
+        const k = r.kind + r.text;
+        if (!added.has(k)) { added.add(k); remarks.push(r); }
+      };
+      const base = { subject, date, hasGrade: false };
+
+      td.querySelectorAll(".grade").forEach((g) => {
+        const label = txt(g.querySelector(".grade_active"));
+        if (!label) return;
+        const note = txt(g.querySelector(".grade_notes"));
+        grades.push({ subject, value: numeric(label), label, date, kind: g.closest(".grade_is_important") ? "Kontrolltöö" : "Hinne", note: note || undefined });
+        if (note) add({ ...base, hasGrade: true, kind: "tagasiside", text: note });
+      });
+
+      td.querySelectorAll('[class*="grade_param_is_"]').forEach((p) => {
+        const c = p.className;
+        if (/is_notify/.test(c)) {
+          add({ ...base, kind: "märkus", text: td.getAttribute("data-notes") || noteOf(p.closest(".lesson_notes")) || "Tähelepanu" });
+        } else if (/is_absent/.test(c)) {
+          const excused = /absent_excused/.test(c);
+          add({ ...base, kind: "puudumine", excused, text: excused ? "Puudus põhjusega" : "Puudus põhjuseta" });
+        } else if (/is_late/.test(c)) add({ ...base, kind: "hilinemine", text: "Hilines" });
+        else if (/is_no_homework/.test(c)) add({ ...base, kind: "tegemata töö", text: "Kodutöö tegemata" });
+        else if (/is_excused/.test(c)) add({ ...base, kind: "vabastatud", text: "Vabastatud" });
+      });
+      if (topics.length || homework.length || td.querySelector(".grade_container")) cells.push(cell);
+    });
+  });
+  return { grades, remarks, cells };
 }

@@ -4,6 +4,7 @@ export type Grade = {
   label: string; // kuvatav hinne: "4", "A"
   date: string; // ISO
   kind: string; // nt "Kontrolltöö"
+  note?: string; // õpetaja tagasiside (jutumull)
   weight?: number;
 };
 
@@ -26,12 +27,15 @@ export type Homework = {
 export type YearSummary = { year: string; periods: string[]; final?: string };
 export type SummaryRow = { subject: string; years: YearSummary[] };
 
+/** Tabeli lahter: ainetunni teema ja kodutöö ühel päeval. */
+export type LessonCell = { subject: string; date: string; topics: string[]; homework: string[] };
+
 /** Hinde-/tunnikirje märge: puudumine, hilinemine, tegemata töö, õpetaja märkus. */
 export type Remark = {
   subject: string;
   date: string;
-  kind: "puudumine" | "hilinemine" | "tegemata töö" | "märkus" | "muu";
-  text: string; // õpetaja kommentaar või märke tekst
+  kind: "puudumine" | "hilinemine" | "tegemata töö" | "märkus" | "tagasiside" | "vabastatud" | "muu";
+  text: string; // õpetaja märkus (!) või tagasiside (jutumull) või märke tekst
   teacher?: string;
   excused?: boolean;
   hasGrade: boolean; // kui hinne on olemas, on kommentaar tõenäoliselt hinde selgitus, mitte märkus
@@ -61,6 +65,7 @@ export type StuudiumData = {
   summary: SummaryRow[];
   remarks: Remark[];
   posts: Post[];
+  cells: LessonCell[];
   classNotes: ClassNote[];
   classTeacher?: string;
   student: string;

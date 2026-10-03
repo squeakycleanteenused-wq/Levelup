@@ -1,0 +1,13 @@
+import { readFileSync } from "node:fs";
+import { JSDOM } from "jsdom";
+import { parseGradeGrid } from "../src/data/parsers";
+import { attention } from "../src/data/attention";
+const doc = new JSDOM(readFileSync(process.argv[2], "utf8")).window.document;
+const g = parseGradeGrid(doc);
+console.log("grades", g.grades.length, "remarks", g.remarks.length, "cells", g.cells.length);
+const from = (k: string) => g.remarks.filter((r) => r.kind === k);
+for (const k of ["märkus", "hilinemine", "tegemata töö", "vabastatud"]) console.log(k, from(k).map((r) => `${r.date} ${r.subject}: ${r.text.slice(0, 50)}`));
+console.log("puudumine põhjuseta", g.remarks.filter((r) => r.kind === "puudumine" && !r.excused).length, "põhjusega", g.remarks.filter((r) => r.kind === "puudumine" && r.excused).length);
+console.log("tagasiside", from("tagasiside").map((r) => `${r.date} ${r.subject}: ${r.text.slice(0, 40)}`));
+console.log(g.grades.map((x) => `${x.date} ${x.subject} ${x.label}`).join("\n"));
+console.log("ATT", attention({ grades: g.grades, remarks: g.remarks, homework: [] } as any, "2026-10-03").map((i) => `${i.severity} ${i.kind} ${i.title} ${i.date} :: ${i.detail.slice(0, 40)}`));

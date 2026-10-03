@@ -24,10 +24,10 @@ export function attention(data: StuudiumData, today = new Date().toISOString().s
     } else if (r.kind === "hilinemine" || r.kind === "muu") {
       items.push({ severity: 2, kind: r.kind === "hilinemine" ? "Hilinemine" : "Märge", title: r.subject, detail: r.text, date: r.date });
     } else if (r.kind === "märkus") {
-      const neg = NEGATIVE.test(r.text);
-      // kommentaar hinde juures või puudumise juures on selgitus, mitte märkus (v.a märkesõnad)
-      const explains = r.hasGrade || data.remarks.some((x) => x.kind === "puudumine" && x.date === r.date && x.subject === r.subject);
-      if (neg || !explains) items.push({ severity: neg ? 3 : 2, kind: "Märkus", title: `${r.subject}${who}`, detail: r.text, date: r.date });
+      // hüüumärk (!) Stuudiumis = õpetaja märkus
+      items.push({ severity: 3, kind: "Märkus (!)", title: `${r.subject}${who}`, detail: r.text, date: r.date });
+    } else if (r.kind === "tagasiside" && NEGATIVE.test(r.text)) {
+      items.push({ severity: 2, kind: "Tagasiside", title: `${r.subject}${who}`, detail: r.text, date: r.date });
     }
   }
 
