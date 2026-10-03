@@ -10,10 +10,12 @@ export type ExtSettings = {
   everyMin: number; // 0 = ainult käsitsi
 };
 
+import { cleanSecret } from "../../src/data/clean";
+
 declare const __LEVELUP_DEFAULTS__: { supabaseUrl: string; supabaseKey: string; password: string };
 
 export const defaults: ExtSettings = {
-  host: "variku.ope.ee", supabaseUrl: __LEVELUP_DEFAULTS__.supabaseUrl, supabaseKey: __LEVELUP_DEFAULTS__.supabaseKey, password: __LEVELUP_DEFAULTS__.password, teacher: "Olena", className: "5b", studentId: "", groupId: "", everyMin: 30,
+  host: "variku.ope.ee", supabaseUrl: cleanSecret(__LEVELUP_DEFAULTS__.supabaseUrl), supabaseKey: cleanSecret(__LEVELUP_DEFAULTS__.supabaseKey), password: __LEVELUP_DEFAULTS__.password, teacher: "Olena", className: "5b", studentId: "", groupId: "", everyMin: 30,
 };
 
 export type Status = { at: string; ok: boolean; message: string; counts?: Record<string, number> };

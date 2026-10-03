@@ -1,16 +1,17 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { decrypt, encrypt, type ChatKeys, type Plain } from "./chatCrypto";
+import { cleanSecret } from "./clean";
 
 export type ChatMsg = { id: string; at: string; name: string; text: string };
 
-const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const anon = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+const url = cleanSecret((import.meta.env.VITE_SUPABASE_URL as string | undefined) ?? "") || undefined;
+const anon = cleanSecret((import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined) ?? "") || undefined;
 export const chatConfigured = !!(url && anon);
 
 /** Laiendus annab Supabase'i andmed seadetest (mitte keskkonnamuutujatest). */
 let override: { url: string; anon: string } | null = null;
 export function setClientConfig(u: string, a: string) {
-  override = { url: u, anon: a };
+  override = { url: cleanSecret(u), anon: cleanSecret(a) };
   client = null;
 }
 
