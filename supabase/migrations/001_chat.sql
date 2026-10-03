@@ -16,3 +16,7 @@ create policy "chat insert" on public.chat_messages for insert with check (true)
 -- Uuendamist ja kustutamist ei lubata.
 
 alter publication supabase_realtime add table public.chat_messages;
+
+-- Vajalik, kui Supabase'is on "Automatically expose new tables" välja lülitatud.
+grant usage on schema public to anon;
+grant select, insert on public.chat_messages to anon;
