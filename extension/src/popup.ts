@@ -31,7 +31,10 @@ $("openTab").addEventListener("click", () => { openInTab(); window.close(); });
 $("save").addEventListener("click", async () => {
   const s = { ...(await getSettings()) } as Record<string, unknown>;
   keys.forEach((k) => { const i = document.getElementById(k) as HTMLInputElement | null; if (i) s[k] = typeof defaults[k] === "number" ? Number(i.value) : i.value.trim(); });
+  const pw = String(s.password ?? "");
+  if (pw && pw.length < 8) { $("status").className = "err"; $("status").textContent = "Perekonna parool peab olema vähemalt 8 märki ja ainulaadne (kes sama parooli teab, näeb samu andmeid)."; return; }
   await saveSettings(s as unknown as ExtSettings);
+  $("status").className = "ok";
   $("status").textContent = "Seaded salvestatud.";
 });
 
