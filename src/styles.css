@@ -84,3 +84,6 @@ a.ext { font-size:13px; color:var(--accent); text-decoration:none; font-weight:6
 .pts { color:var(--accent); font-weight:700; }
 .edit { display:flex; gap:6px; align-items:center; margin:6px 0; } .edit input[type=text], .edit input:not([type]) { flex:1; min-width:0; padding:8px; border-radius:8px; border:1px solid #8885; }
 .link { background:none; border:0; color:var(--accent); text-decoration:underline; cursor:pointer; padding:0; font-size:14px; }
+.welcome h2 { font-size:20px; opacity:1; } .seg { display:flex; gap:8px; margin:8px 0 12px; } .seg .chip { flex:1; padding:10px; }
+.tips, .steps { margin:8px 0 12px 18px; padding:0; } .steps li { margin:10px 0; } .small { font-size:13px; }
+.chip { border:1px solid #8885; }

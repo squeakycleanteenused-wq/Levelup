@@ -15,9 +15,11 @@ Selge ülevaade Stuudiumist lapsevanemale: mis on **kiire**, millal on **kontrol
 
 ---
 
-## Samm 1. Mõtle välja perekonna parool
+## Samm 1. Ava Levelup ja loo perekonna parool
 
-See on **sinu pere luku kood**. Sellega krüpteeritakse sinu lapse andmed.
+Ava veebiäpi link (**LINK TULEB SIIA**). Vali **Olen uus** ja mõtle välja perekonna parool (sisesta see kaks korda). Kontot ega e-posti pole vaja. Äpp näitab sulle järgmised sammud ja kontrollib ise, kas andmed on kohale jõudnud.
+
+See parool on **sinu pere luku kood**. Sellega krüpteeritakse sinu lapse andmed.
 
 - Mõtle välja **pikk, ainulaadne parool** (vähemalt 8 märki), nt kolm sõna kokku.
 - **Ei ole** sinu Stuudiumi parool. Ära kasuta kunagi seda!
@@ -57,8 +59,8 @@ See on **sinu pere luku kood**. Sellega krüpteeritakse sinu lapse andmed.
 
 ## Samm 5. Ava Levelup
 
-1. Mine veebiäpi lingile (**LINK TULEB SIIA**).
-2. Sisesta sama **perekonna parool**. Äpp jätab selle selles seadmes meelde.
+1. Ava äpp. Teises seadmes (nt telefon) vali **Mul on parool** ja sisesta sama perekonna parool. Äpp jätab selle seadmesse meelde.
+2. Vajuta **Kontrolli, kas andmed jõudsid kohale**.
 3. Näed **Hetkeseisu**, õpilase tegevust, klassijuhataja postitusi ja kodutöid.
 
 ## Samm 6. Pane telefoni

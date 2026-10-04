@@ -15,6 +15,7 @@ import Chat from "./views/Chat";
 import Points from "./views/Points";
 import type { ChatKeys } from "./data/chatCrypto";
 import Unlock from "./views/Unlock";
+import Onboarding from "./views/Onboarding";
 
 const get = (k: string) => { try { return localStorage.getItem(k) ?? ""; } catch { return ""; } };
 const put = (k: string, v: string) => { try { localStorage.setItem(k, v); } catch { /* ignoreeri */ } };
@@ -35,6 +36,9 @@ export default function App() {
   const [pw, setPw] = useState(password());
   const [error, setError] = useState("");
   const [wrong, setWrong] = useState(false);
+  const [recheck, setRecheck] = useState(0);
+  const [checking, setChecking] = useState(false);
+  const [onboard, setOnboard] = useState(get("onboard") === "1");
   const [theme, setTheme] = useState(getTheme());
   const [anim, setAnim] = useState(getAnimOn() && !matchMedia("(prefers-reduced-motion: reduce)").matches);
 
@@ -46,6 +50,7 @@ export default function App() {
     if (!pw || !chatConfigured) return;
     let stop = false;
     const pull = async () => {
+      setChecking(true);
       try {
         const s = await loadSnapshot(await deriveKeys(pw));
         if (stop) return;
@@ -56,18 +61,22 @@ export default function App() {
         setUpdated(s.at);
         put("data", JSON.stringify(s.data));
         put("updatedAt", s.at);
+        put("onboard", "0");
+        setOnboard(false);
       } catch (e) {
         if (!stop) setError("Ühendus pilvega ebaõnnestus: " + String(e));
+      } finally {
+        if (!stop) setChecking(false);
       }
     };
     pull();
     const t = setInterval(pull, 5 * 60_000);
     return () => { stop = true; clearInterval(t); };
-  }, [pw]);
+  }, [pw, recheck]);
 
   useEffect(() => { if (pw) deriveKeys(pw).then(setKeys); else setKeys(null); }, [pw]);
 
-  const unlock = (p: string) => { put("familyPw", p); setError(""); setWrong(false); setPw(p); };
+  const unlock = (p: string, isNew: boolean) => { put("familyPw", p); put("onboard", isNew ? "1" : "0"); setOnboard(isNew); setError(""); setWrong(false); setPw(p); };
   const changePassword = () => { try { localStorage.removeItem("familyPw"); } catch { /* ignoreeri */ } setPw(""); setKeys(null); setError(""); setWrong(false); };
   const when = updated ? new Date(updated).toLocaleString("et-EE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
 
@@ -84,7 +93,9 @@ export default function App() {
 
       {tab === "home" && (
         <main>
-          {(!pw || (wrong && !data)) && <Unlock error={error} onUnlock={unlock} />}
+          {!pw && <Unlock error={error} onUnlock={unlock} />}
+          {pw && wrong && !data && onboard && <Onboarding pw={pw} checking={checking} message={checking ? "" : "Andmeid pole veel. Tee ülaltoodud sammud ja proovi uuesti."} onCheck={() => setRecheck((n) => n + 1)} />}
+          {pw && wrong && !data && !onboard && <Unlock error={error} onUnlock={unlock} />}
           {pw && !wrong && error && !data && <p className="err pad">{error}</p>}
           {pw && !wrong && !data && !error && <p className="pad">Laen…</p>}
           {data && (
