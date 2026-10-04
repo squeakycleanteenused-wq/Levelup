@@ -8,7 +8,7 @@ Selge ülevaade Stuudiumist lapsevanemale: mis on **kiire**, millal on **kontrol
 
 ## Mida sa vajad
 
-- Arvuti brauseriga **Chrome, Opera, Edge või Brave** (Firefox ei sobi laienduse jaoks).
+- Arvuti brauseriga **Chrome, Edge, Brave või Opera** (need töötavad). **Firefox** on katsetamisel, vt allpool.
 - Oma **Stuudiumi vanema konto** (sama, millega tavaliselt sisse logid).
 - Veebiäpi **link** (küsi selle käest, kes sulle selle saatis).
 - 10 minutit aega esimesel korral.
@@ -37,6 +37,14 @@ See parool on **sinu pere luku kood**. Sellega krüpteeritakse sinu lapse andmed
 4. Lülita sisse **Developer mode** (Arendaja režiim, tavaliselt paremal üleval).
 5. Vajuta **Load unpacked** (Laadi lahti pakitud) ja vali lahti pakitud **kaust**.
 6. Laiendus **"Levelup Stuudiumi sild"** ilmub nimekirja. Kinnita see tööriistaribale (pusle-ikoon 🧩).
+
+### Kui kasutad Firefoxi (katsetamisel)
+
+1. Lae alla **[levelup-extension-firefox.zip](releases/levelup-extension-firefox.zip)** ja paki **lahti**.
+2. Ava aadress `about:debugging#/runtime/this-firefox`.
+3. Vajuta **Load Temporary Add-on** ja vali lahti pakitud kaustast fail **manifest.json**.
+4. Ava `about:addons` → Levelup → **Permissions** ja luba juurdepääs saitidele (Stuudium).
+5. **Pane tähele:** Firefoxis kaob ajutine laiendus brauseri sulgemisel ja tuleb uuesti laadida. Püsivaks tegemiseks tuleb laiendus Mozilla poolt allkirjastada (vt administraatori osa). Seda versiooni pole veel Firefoxis testitud, anna vigadest teada.
 
 ## Samm 3. Täida laienduse seaded (üks kord)
 
@@ -138,10 +146,13 @@ Telefon näitab sama infot. Uuendamiseks peab arvutis olema laiendus käimas (vt
 
 **Supabase** (andmebaas): tabelid on kaustas `supabase/migrations/` (001 chat, 002 sünkroon, 003 õigused, 004 punktiraamat). Käivita need SQL Editoris järjest.
 
+**Laiendus poodi (soovitus, kui jagad paljudele):** Chrome Web Store ($5 ühekordselt), Edge Add-ons (tasuta) ja Firefox AMO (tasuta, allkirjastab ja teeb püsivaks). Siis paigaldus on üks klikk ja "Developer mode" pole vaja. Chrome ütleb arendaja režiimis laaditud laienduste kohta iga käivitusel hoiatuse.
+
 **Laienduse ehitus ise** (kui tahad muuta):
 ```
 npm install
-npm run build:ext
+npm run build:ext            # Chrome, Edge, Brave, Opera -> extension/dist
+npm run build:ext:firefox    # Firefox -> extension/dist-firefox
 ```
 Valmis kaust on `extension/dist`. Ava `.env` näidis failist `.env.example`.
 

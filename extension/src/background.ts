@@ -1,4 +1,5 @@
 import { getSettings, setStatus, type ExtSettings } from "./shared";
+import { processPages, type ProcessResult } from "./process";
 
 /**
  * Käib Stuudiumi lehed läbi SINU brauseris sinu sisselogimisega (tavaline vanem, mitte robot).
@@ -86,8 +87,15 @@ export async function runSync(): Promise<string> {
     await grab("kalender", () => renderHtml(`${base}/suhtlus/calendar`, ".cal-day[data-cal-date]"));
     if (groupId) await grab("jututuba", () => renderHtml(`${base}/chat/g/${groupId}`, ".chat-room-messages .msg"));
 
-    await ensureOffscreen();
-    const res = (await chrome.runtime.sendMessage({ target: "offscreen", type: "process", pages, settings: s })) as { ok: boolean; message: string; counts?: Record<string, number> };
+    let res: ProcessResult;
+    if (typeof (chrome as unknown as { offscreen?: unknown }).offscreen !== "undefined") {
+      // Chromium: teenindustöötajal pole DOM-i, töötleme offscreen-dokumendis
+      await ensureOffscreen();
+      res = (await chrome.runtime.sendMessage({ target: "offscreen", type: "process", pages, settings: s })) as ProcessResult;
+    } else {
+      // Firefox: taustaleht (event page) on DOM-iga, töötleme otse siin
+      res = await processPages(pages, s);
+    }
     const message = res.ok ? `Uuendatud${errors.length ? " (osaliselt: " + errors.join("; ") + ")" : ""}` : res.message;
     await setStatus({ at, ok: res.ok, message, counts: res.counts });
     return message;

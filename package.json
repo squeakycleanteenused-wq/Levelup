@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "build:ext": "vite build --config vite.extension.config.ts"
+    "build:ext": "vite build --config vite.extension.config.ts",
+    "build:ext:firefox": "npm run build:ext && node scripts/make-firefox.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
