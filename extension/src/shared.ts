@@ -20,6 +20,9 @@ export const defaults: ExtSettings = {
 
 export type Status = { at: string; ok: boolean; message: string; counts?: Record<string, number> };
 
+/** Kooli aadress: "https://variku.ope.ee/" -> "variku.ope.ee" */
+export const cleanHost = (h: string) => h.trim().replace(/^https?:\/\//i, "").replace(/\/.*$/, "");
+
 export const getSettings = async (): Promise<ExtSettings> => {
   const saved = ((await chrome.storage.local.get("settings")).settings ?? {}) as Partial<ExtSettings>;
   const merged = { ...defaults } as Record<string, unknown>;
@@ -27,6 +30,8 @@ export const getSettings = async (): Promise<ExtSettings> => {
   Object.entries(saved).forEach(([k, v]) => { if (v !== "" && v !== undefined) merged[k] = v; });
   // ehitamisel .env-st võetud ühenduse andmed ületavad vanu salvestatud (võimalik, et valesid) väärtusi
   (["supabaseUrl", "supabaseKey", "password"] as const).forEach((k) => { if (defaults[k]) merged[k] = defaults[k]; });
+  merged.host = cleanHost(String(merged.host ?? "")) || defaults.host;
+  merged.password = String(merged.password ?? "").trim();
   return merged as unknown as ExtSettings;
 };
 export const saveSettings = (s: ExtSettings) => chrome.storage.local.set({ settings: s });

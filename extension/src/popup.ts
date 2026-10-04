@@ -1,4 +1,4 @@
-import { defaults, getSettings, getStatus, saveSettings, type ExtSettings } from "./shared";
+import { cleanHost, defaults, getSettings, getStatus, saveSettings, type ExtSettings } from "./shared";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const keys = Object.keys(defaults) as (keyof ExtSettings)[];
@@ -31,7 +31,8 @@ $("openTab").addEventListener("click", () => { openInTab(); window.close(); });
 $("save").addEventListener("click", async () => {
   const s = { ...(await getSettings()) } as Record<string, unknown>;
   keys.forEach((k) => { const i = document.getElementById(k) as HTMLInputElement | null; if (i) s[k] = typeof defaults[k] === "number" ? Number(i.value) : i.value.trim(); });
-  const pw = String(s.password ?? "");
+  s.host = cleanHost(String(s.host ?? ""));
+  const pw = String(s.password ?? "").trim();
   if (pw && pw.length < 8) { $("status").className = "err"; $("status").textContent = "Perekonna parool peab olema vähemalt 8 märki ja ainulaadne (kes sama parooli teab, näeb samu andmeid)."; return; }
   await saveSettings(s as unknown as ExtSettings);
   $("status").className = "ok";

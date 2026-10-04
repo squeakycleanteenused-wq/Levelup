@@ -4,12 +4,12 @@ import { useState } from "react";
 export default function Unlock({ error, onUnlock }: { error: string; onUnlock: (pw: string) => void }) {
   const [pw, setPw] = useState("");
   return (
-    <form className="card login" onSubmit={(e) => { e.preventDefault(); if (pw.length >= 8) onUnlock(pw); }}>
+    <form className="card login" onSubmit={(e) => { e.preventDefault(); if (pw.trim().length >= 8) onUnlock(pw.trim()); }}>
       <b>🔒 Sisesta perekonna parool</b>
       <small>See on parool, mille mõtlesid välja äpi ja laienduse jaoks (mitte Stuudiumi parool). Igal perel on oma. Kes sama parooli teab, näeb sama andmeid, seega vali pikk ja ainulaadne (vähemalt 8 märki).</small>
       <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="off" autoFocus />
-      <button className="primary" disabled={pw.length < 8}>Ava</button>
-      {pw.length > 0 && pw.length < 8 && <small>Veel {8 - pw.length} märki</small>}
+      <button className="primary" disabled={pw.trim().length < 8}>Ava</button>
+      {pw.trim().length > 0 && pw.trim().length < 8 && <small>Veel {8 - pw.trim().length} märki</small>}
       {error && <small className="err">{error}</small>}
     </form>
   );

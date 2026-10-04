@@ -15,14 +15,16 @@
 <button id="sync">Uuenda kohe</button>
 <div id="tabhint" style="margin-top:8px"><button class="link" id="openTab">Ava seaded eraldi vahelehel (kui aken sulgub)</button></div>
 <details id="cfg"><summary>Seaded</summary>
-  <label>Supabase'i aadress</label><input id="supabaseUrl" placeholder="https://xxxx.supabase.co">
-  <label>Supabase'i anon-võti</label><input id="supabaseKey">
-  <label>Perekonna parool (sama mis äpis)</label><input id="password" type="password" autocomplete="off">
-  <label>Kooli aadress</label><input id="host">
-  <label>Klassijuhataja eesnimi</label><input id="teacher">
-  <label>Klass</label><input id="className">
-  <label>Uuenda iga (min, 0 = ainult käsitsi, vähemalt 15)</label><input id="everyMin" type="number" min="0">
-  <label>Õpilase id (tühi = tuvasta ise)</label><input id="studentId">
+  <label>Perekonna parool (sama mis äpis, vähemalt 8 märki, ainult teie pere teada)</label><input id="password" type="password" autocomplete="off">
+  <label>Kooli aadress (nt variku.ope.ee)</label><input id="host">
+  <label>Klassijuhataja eesnimi (nt Olena)</label><input id="teacher">
+  <label>Klass (nt 5b)</label><input id="className">
+  <details style="margin-top:12px"><summary style="font-size:12px;opacity:.7">Täpsemalt (tavaliselt ei pea muutma)</summary>
+    <label>Supabase'i aadress</label><input id="supabaseUrl" placeholder="https://xxxx.supabase.co">
+    <label>Supabase'i võti</label><input id="supabaseKey">
+    <label>Uuenda iga (min, 0 = ainult käsitsi, vähemalt 15)</label><input id="everyMin" type="number" min="0">
+    <label>Õpilase id (tühi = tuvasta ise)</label><input id="studentId">
+  </details>
   <button id="save">Salvesta seaded</button>
 </details>
 <script type="module" src="./src/popup.ts"></script>
