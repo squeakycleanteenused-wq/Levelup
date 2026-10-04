@@ -22,7 +22,7 @@ export default function Status({ data }: { data: StuudiumData }) {
       {!calm && (
         <ul>
           {urgent.length > 0 && <li>{urgent.length} märkust või madalat hinnet viimase kahe nädala jooksul</li>}
-          {newPosts.length > 0 && <li>Olena: {newPosts.filter((p) => !p.updated).length ? `${newPosts.filter((p) => !p.updated).length} uut` : ""}{newPosts.some((p) => p.updated) && newPosts.some((p) => !p.updated) ? " ja " : ""}{newPosts.some((p) => p.updated) ? `${newPosts.filter((p) => p.updated).length} uuendatud` : ""} postitust</li>}
+          {newPosts.length > 0 && <li>{data.classTeacher || "Klassijuhataja"}: {newPosts.filter((p) => !p.updated).length ? `${newPosts.filter((p) => !p.updated).length} uut` : ""}{newPosts.some((p) => p.updated) && newPosts.some((p) => !p.updated) ? " ja " : ""}{newPosts.some((p) => p.updated) ? `${newPosts.filter((p) => p.updated).length} uuendatud` : ""} postitust</li>}
           {overdue.length > 0 && <li>{overdue.length} kodutööd on tähtaja ületanud ja pole tehtuks märgitud</li>}
         </ul>
       )}

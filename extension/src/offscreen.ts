@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener((m, _s, send) => {
       const data = buildFromDocs(docs, emptyData(), { year: new Date().getFullYear(), teacher: s.teacher, className: s.className, baseUrl: `https://${s.host}` });
       setClientConfig(s.supabaseUrl, s.supabaseKey);
       await saveSnapshot(await deriveKeys(s.password), data);
-      send({ ok: true, message: "ok", counts: { hinded: data.grades.length, märkused: data.remarks.length, kodutööd: data.homework.length, sündmused: data.events.length, postitused: data.posts.length, Olena: data.posts.filter((p) => p.fromClassTeacher).length } });
+      send({ ok: true, message: "ok", counts: { hinded: data.grades.length, märkused: data.remarks.length, kodutööd: data.homework.length, sündmused: data.events.length, postitused: data.posts.length, klassijuhataja: data.posts.filter((p) => p.fromClassTeacher).length } });
     } catch (e) {
       send({ ok: false, message: (e as Error).message });
     }
