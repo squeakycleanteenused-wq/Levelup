@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { StuudiumData } from "../data/types";
 import type { ChatKeys } from "../data/chatCrypto";
 import { chatConfigured } from "../data/chatApi";
-import { SCHOOL_TASK, compute, localDay, newEntry, type Entry } from "../data/ledger";
+import { SCHOOL_TASK, compute, localDay, newEntry, type Config, type Entry } from "../data/ledger";
 import { loadLocal, pullCloud, pushCloud, saveLocal, subscribeCloud } from "../data/ledgerStore";
 import { hasPin, isParent, lockParent, unlockParent } from "../data/parent";
 
@@ -189,7 +189,51 @@ function ParentPanel({ st, add, onLock }: { st: ReturnType<typeof compute>; add:
         <button className="chip" disabled={!valid} onClick={() => { add({ by: "vanem", kind: "penalty", points: n, reason: reason.trim() }); setPts(""); setReason(""); }}>− Trahv</button>{" "}
         <button className="chip" disabled={!valid} onClick={() => { add({ by: "vanem", kind: "bonus", points: n, reason: reason.trim() }); setPts(""); setReason(""); }}>+ Boonus</button>
       </div>
+      <Editor config={st.config} onSave={(config) => add({ by: "vanem", kind: "config", config })} />
       <div style={{ marginTop: 10 }}><button className="chip" onClick={onLock}>🔒 Lukusta</button></div>
     </div>
+  );
+}
+
+/** Ülesannete ja auhindade nimekirja muutmine. Salvestub pere punktiraamatusse, nii et kõik seadmed näevad sama. */
+function Editor({ config, onSave }: { config: Config; onSave: (c: Config) => void }) {
+  const [cfg, setCfg] = useState<Config>(config);
+  useEffect(() => setCfg(config), [config]);
+  const uid = () => Math.random().toString(36).slice(2, 8);
+  const num = (v: string) => Math.max(0, Math.round(Number(v) || 0));
+  const setTask = (i: number, patch: Partial<Config["tasks"][number]>) => setCfg({ ...cfg, tasks: cfg.tasks.map((t, j) => (j === i ? { ...t, ...patch } : t)) });
+  const setReward = (i: number, patch: Partial<Config["rewards"][number]>) => setCfg({ ...cfg, rewards: cfg.rewards.map((r, j) => (j === i ? { ...r, ...patch } : r)) });
+  const dirty = JSON.stringify(cfg) !== JSON.stringify(config);
+
+  return (
+    <details style={{ marginTop: 10 }}>
+      <summary><b>✏️ Muuda ülesandeid ja auhindu</b></summary>
+      <h2 style={{ marginTop: 10 }}>Ülesanded</h2>
+      {cfg.tasks.map((t, i) => (
+        <div key={t.id} className="edit">
+          <input value={t.label} onChange={(e) => setTask(i, { label: e.target.value })} aria-label="Nimi" />
+          <input value={t.points} onChange={(e) => setTask(i, { points: num(e.target.value) })} inputMode="numeric" aria-label="Punktid" style={{ width: 64 }} />
+          <label title="Boonus"><input type="checkbox" checked={!!t.bonus} onChange={(e) => setTask(i, { bonus: e.target.checked })} /> <small>boonus</small></label>
+          {t.id !== SCHOOL_TASK && <button className="chip" onClick={() => setCfg({ ...cfg, tasks: cfg.tasks.filter((_, j) => j !== i) })} aria-label="Kustuta">✕</button>}
+        </div>
+      ))}
+      <button className="chip" onClick={() => setCfg({ ...cfg, tasks: [...cfg.tasks, { id: "t" + uid(), label: "", points: 10 }] })}>+ Lisa ülesanne</button>
+
+      <h2 style={{ marginTop: 14 }}>Auhinnad</h2>
+      {cfg.rewards.map((r, i) => (
+        <div key={r.id} className="edit">
+          <input value={r.label} onChange={(e) => setReward(i, { label: e.target.value })} aria-label="Nimi" />
+          <input value={r.cost} onChange={(e) => setReward(i, { cost: num(e.target.value) })} inputMode="numeric" aria-label="Hind" style={{ width: 64 }} />
+          <button className="chip" onClick={() => setCfg({ ...cfg, rewards: cfg.rewards.filter((_, j) => j !== i) })} aria-label="Kustuta">✕</button>
+        </div>
+      ))}
+      <button className="chip" onClick={() => setCfg({ ...cfg, rewards: [...cfg.rewards, { id: "r" + uid(), label: "", cost: 100 }] })}>+ Lisa auhind</button>
+
+      <div style={{ marginTop: 12 }}>
+        <button className="primary" disabled={!dirty} onClick={() => onSave({ tasks: cfg.tasks.filter((t) => t.label.trim()), rewards: cfg.rewards.filter((r) => r.label.trim()) })}>Salvesta nimekiri</button>
+        {dirty && <small> Salvestamata muudatused</small>}
+      </div>
+      <p><small>Kooli tööde ülesanne (+20) jääb alles, selle punkte saab muuta. Juba teenitud punktid ei muutu.</small></p>
+    </details>
   );
 }

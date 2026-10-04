@@ -19,3 +19,8 @@ const ok = e({ by: "vanem", kind: "redeem_ok", ref: r.id });
 s = compute([d1, d2, a1, a2, bonus, pen, r, ok], t);
 console.log("saldo pärast ostu:", s.balance, "(oodatud 118-150=-32) | taotlusi:", s.redeemRequests.length);
 console.log(s.history.map((h) => `${h.delta >= 0 ? "+" : ""}${h.delta} ${h.note}`).join(" | "));
+
+// nimekirja muutmine: viimane config kirje kehtib, vanad punktid ei muutu
+const cfg = e({ by: "vanem", kind: "config", config: { tasks: [{ id: "bed", label: "Voodi", points: 15 }, { id: "dog", label: "Koer õue", points: 25 }], rewards: [{ id: "x", label: "Jäätis", cost: 50 }] } });
+s = compute([d1, a1, cfg], t);
+console.log("uus nimekiri:", s.config.tasks.map((x) => `${x.label} ${x.points}`).join(", "), "| saldo jäi:", s.balance, "(oodatud 10)");
