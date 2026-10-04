@@ -15,7 +15,7 @@ import { ClassPosts } from "./views/Posts";
 import Chat from "./views/Chat";
 import Points from "./views/Points";
 import type { ChatKeys } from "./data/chatCrypto";
-import Unlock from "./views/Unlock";
+import Unlock, { type TryResult } from "./views/Unlock";
 import Onboarding from "./views/Onboarding";
 
 const get = (k: string) => { try { return localStorage.getItem(k) ?? ""; } catch { return ""; } };
@@ -78,6 +78,18 @@ export default function App() {
   useEffect(() => { if (pw) deriveKeys(pw).then(setKeys); else setKeys(null); }, [pw]);
 
   const unlock = (p: string, isNew: boolean) => { put("familyPw", p); put("onboard", isNew ? "1" : "0"); setOnboard(isNew); setError(""); setWrong(false); setPw(p); };
+  // Sisselogimiskast: kontrolli, kas selle parooliga on pere olemas
+  const tryPassword = async (p: string): Promise<TryResult> => {
+    if (!chatConfigured) return "error";
+    try {
+      const s = await loadSnapshot(await deriveKeys(p));
+      if (!s) return "empty";
+      unlock(p, false);
+      return "found";
+    } catch {
+      return "error";
+    }
+  };
   const changePassword = () => { try { localStorage.removeItem("familyPw"); } catch { /* ignoreeri */ } setPw(""); setKeys(null); setError(""); setWrong(false); };
   const when = updated ? new Date(updated).toLocaleString("et-EE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
 
@@ -94,9 +106,9 @@ export default function App() {
 
       {tab === "home" && (
         <main>
-          {!pw && <Unlock error={error} onUnlock={unlock} />}
+          {!pw && <Unlock error={error} onTry={tryPassword} onCreate={(p) => unlock(p, true)} />}
           {pw && wrong && !data && onboard && <Onboarding pw={pw} checking={checking} message={checking ? "" : "Andmeid pole veel. Tee ülaltoodud sammud ja proovi uuesti."} onCheck={() => setRecheck((n) => n + 1)} />}
-          {pw && wrong && !data && !onboard && <Unlock error={error} onUnlock={unlock} />}
+          {pw && wrong && !data && !onboard && <Unlock error={error} onTry={tryPassword} onCreate={(p) => unlock(p, true)} />}
           {pw && !wrong && error && !data && <p className="err pad">{error}</p>}
           {pw && !wrong && !data && !error && <p className="pad">Laen…</p>}
           {data && (
