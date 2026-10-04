@@ -6,6 +6,7 @@ export default function Unlock({ error, onUnlock }: { error: string; onUnlock: (
   return (
     <form className="card login" onSubmit={(e) => { e.preventDefault(); if (pw) onUnlock(pw); }}>
       <b>🔒 Sisesta perekonna parool</b>
+      <small>See on parool, mille mõtlesid välja äpi ja laienduse jaoks (mitte Stuudiumi parool).</small>
       <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="off" autoFocus />
       <button className="primary">Ava</button>
       {error && <small className="err">{error}</small>}

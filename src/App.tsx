@@ -20,6 +20,12 @@ const get = (k: string) => { try { return localStorage.getItem(k) ?? ""; } catch
 const put = (k: string, v: string) => { try { localStorage.setItem(k, v); } catch { /* ignoreeri */ } };
 const password = () => get("familyPw") || (import.meta.env.DEV ? ((import.meta.env.VITE_FAMILY_PASSWORD as string | undefined) ?? "") : "");
 
+// Hädaväljapääs: lisa aadressi lõppu ?reset=1, et unustada salvestatud parool ja andmed selles seadmes
+if (typeof location !== "undefined" && new URLSearchParams(location.search).has("reset")) {
+  try { ["familyPw", "data", "updatedAt"].forEach((k) => localStorage.removeItem(k)); } catch { /* ignoreeri */ }
+  history.replaceState(null, "", location.pathname);
+}
+
 export default function App() {
   const season = seasonOf();
   const [tab, setTab] = useState<"home" | "points" | "chat">("home");
@@ -28,6 +34,7 @@ export default function App() {
   const [updated, setUpdated] = useState(get("updatedAt"));
   const [pw, setPw] = useState(password());
   const [error, setError] = useState("");
+  const [wrong, setWrong] = useState(false);
   const [theme, setTheme] = useState(getTheme());
   const [anim, setAnim] = useState(getAnimOn() && !matchMedia("(prefers-reduced-motion: reduce)").matches);
 
@@ -42,7 +49,8 @@ export default function App() {
       try {
         const s = await loadSnapshot(await deriveKeys(pw));
         if (stop) return;
-        if (!s) return setError("Selle parooliga pole andmeid. Kontrolli parooli või uuenda laiendusega.");
+        if (!s) { setWrong(true); return setError("Selle parooliga pole andmeid. Kas parool on vale, või laiendus pole veel andmeid saatnud?"); }
+        setWrong(false);
         setError("");
         setData(s.data);
         setUpdated(s.at);
@@ -59,7 +67,8 @@ export default function App() {
 
   useEffect(() => { if (pw) deriveKeys(pw).then(setKeys); else setKeys(null); }, [pw]);
 
-  const unlock = (p: string) => { put("familyPw", p); setPw(p); };
+  const unlock = (p: string) => { put("familyPw", p); setError(""); setWrong(false); setPw(p); };
+  const changePassword = () => { try { localStorage.removeItem("familyPw"); } catch { /* ignoreeri */ } setPw(""); setKeys(null); setError(""); setWrong(false); };
   const when = updated ? new Date(updated).toLocaleString("et-EE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
 
   return (
@@ -75,9 +84,9 @@ export default function App() {
 
       {tab === "home" && (
         <main>
-          {!pw && <Unlock error={error} onUnlock={unlock} />}
-          {pw && error && !data && <p className="err pad">{error}</p>}
-          {pw && !data && !error && <p className="pad">Laen…</p>}
+          {(!pw || (wrong && !data)) && <Unlock error={error} onUnlock={unlock} />}
+          {pw && !wrong && error && !data && <p className="err pad">{error}</p>}
+          {pw && !wrong && !data && !error && <p className="pad">Laen…</p>}
           {data && (
             <>
               <Status data={data} />
@@ -89,6 +98,7 @@ export default function App() {
             </>
           )}
           <Decor season={season} />
+          {pw && <p className="pad"><button className="link" onClick={changePassword}>🔑 Vaheta parool</button></p>}
         </main>
       )}
       {tab === "points" && <main><Points data={data} keys={keys} /></main>}
