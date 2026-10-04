@@ -87,3 +87,5 @@ a.ext { font-size:13px; color:var(--accent); text-decoration:none; font-weight:6
 .welcome h2 { font-size:20px; opacity:1; } .seg { display:flex; gap:8px; margin:8px 0 12px; } .seg .chip { flex:1; padding:10px; }
 .tips, .steps { margin:8px 0 12px 18px; padding:0; } .steps li { margin:10px 0; } .small { font-size:13px; }
 .chip { border:1px solid #8885; }
+.avg-top { display:flex; align-items:center; gap:16px; } .avg-num { font-size:72px; line-height:1; font-weight:800; letter-spacing:-2px; font-variant-numeric:tabular-nums; }
+.avg-subjects { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; } .avg-chip { background:#8881; border-radius:99px; padding:4px 12px; font-size:14px; }

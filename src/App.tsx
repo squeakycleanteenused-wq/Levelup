@@ -8,6 +8,7 @@ import Falling from "./views/Falling";
 import Pomodoro from "./views/Pomodoro";
 import Decor from "./views/Decor";
 import Status from "./views/Status";
+import Average from "./views/Average";
 import Homework from "./views/Homework";
 import Attention from "./views/Attention";
 import { ClassPosts } from "./views/Posts";
@@ -101,6 +102,7 @@ export default function App() {
           {data && (
             <>
               <Status data={data} />
+              <Average data={data} />
               <Attention data={data} />
               <ClassPosts data={data} limit={5} />
               <Homework data={data} />
