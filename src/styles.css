@@ -89,3 +89,6 @@ a.ext { font-size:13px; color:var(--accent); text-decoration:none; font-weight:6
 .chip { border:1px solid #8885; }
 .avg-top { display:flex; align-items:center; gap:16px; } .avg-num { font-size:72px; line-height:1; font-weight:800; letter-spacing:-2px; font-variant-numeric:tabular-nums; }
 .avg-subjects { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; } .avg-chip { background:#8881; border-radius:99px; padding:4px 12px; font-size:14px; }
+.choose { display:grid; gap:10px; margin-top:12px; } .big { padding:16px; font-size:18px; border-radius:14px; border:2px solid var(--accent); cursor:pointer; }
+.big.alt { background:var(--card); color:var(--accent); } .big.primary { background:var(--accent); color:#fff; }
+.notice { background:#8881; border-radius:12px; padding:10px 12px; display:grid; gap:6px; }

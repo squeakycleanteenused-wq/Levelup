@@ -77,8 +77,17 @@ export default function App() {
 
   useEffect(() => { if (pw) deriveKeys(pw).then(setKeys); else setKeys(null); }, [pw]);
 
-  const unlock = (p: string, isNew: boolean) => { put("familyPw", p); put("onboard", isNew ? "1" : "0"); setOnboard(isNew); setError(""); setWrong(false); setPw(p); };
+  const unlock = (p: string, isNew: boolean) => { put("seenFamily", "1"); put("familyPw", p); put("onboard", isNew ? "1" : "0"); setOnboard(isNew); setError(""); setWrong(false); setPw(p); };
   // Sisselogimiskast: kontrolli, kas selle parooliga on pere olemas
+  // Kas selline pere on juba olemas (ei logi sisse). Uue pere loomisel kaitseb võõra pere andmete kasutamise eest.
+  const familyExists = async (p: string): Promise<TryResult> => {
+    if (!chatConfigured) return "error";
+    try {
+      return (await loadSnapshot(await deriveKeys(p))) ? "found" : "empty";
+    } catch {
+      return "error";
+    }
+  };
   const tryPassword = async (p: string): Promise<TryResult> => {
     if (!chatConfigured) return "error";
     try {
@@ -90,7 +99,7 @@ export default function App() {
       return "error";
     }
   };
-  const changePassword = () => { try { localStorage.removeItem("familyPw"); } catch { /* ignoreeri */ } setPw(""); setKeys(null); setError(""); setWrong(false); };
+  const changePassword = () => { try { ["familyPw", "data", "updatedAt", "onboard"].forEach((k) => localStorage.removeItem(k)); } catch { /* ignoreeri */ } setPw(""); setKeys(null); setData(null); setUpdated(""); setError(""); setWrong(false); setOnboard(false); };
   const when = updated ? new Date(updated).toLocaleString("et-EE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
 
   return (
@@ -106,12 +115,12 @@ export default function App() {
 
       {tab === "home" && (
         <main>
-          {!pw && <Unlock error={error} onTry={tryPassword} onCreate={(p) => unlock(p, true)} />}
+          {!pw && <Unlock error={error} onTry={tryPassword} onExists={familyExists} onCreate={(p) => unlock(p, true)} />}
           {pw && wrong && !data && onboard && <Onboarding pw={pw} checking={checking} message={checking ? "" : "Andmeid pole veel. Tee ülaltoodud sammud ja proovi uuesti."} onCheck={() => setRecheck((n) => n + 1)} />}
-          {pw && wrong && !data && !onboard && <Unlock error={error} onTry={tryPassword} onCreate={(p) => unlock(p, true)} />}
+          {pw && wrong && !data && !onboard && <Unlock error={error} onTry={tryPassword} onExists={familyExists} onCreate={(p) => unlock(p, true)} />}
           {pw && !wrong && error && !data && <p className="err pad">{error}</p>}
           {pw && !wrong && !data && !error && <p className="pad">Laen…</p>}
-          {data && (
+          {data && pw && (
             <>
               <Status data={data} />
               <Average data={data} />

@@ -17,7 +17,12 @@ Selge ülevaade Stuudiumist lapsevanemale: mis on **kiire**, millal on **kontrol
 
 ## Samm 1. Ava Levelup ja loo perekonna parool
 
-Ava veebiäpi link (**LINK TULEB SIIA**) ja kirjuta kasti perekonna parool, mille ise välja mõtled. Kontot ega e-posti pole vaja. Kui äpp ütleb, et selle parooliga pole veel andmeid, sisesta parool uuesti ja vajuta **Loo uus pere ja jätka**. Äpp näitab siis järgmised sammud ja kontrollib ise, kas andmed on kohale jõudnud.
+Ava veebiäpi link (**LINK TULEB SIIA**) ja vali:
+
+- **Olen uus, loon pere**: mõtle välja perekonna parool ja sisesta see kaks korda. Kontot ega e-posti pole vaja. Äpp näitab järgmised sammud ja kontrollib ise, kas andmed on kohale jõudnud.
+- **Mul on parool**: kui pere on juba loodud (nt teises seadmes), sisesta sama parool.
+
+Kui parool on juba kasutusel, ei lase äpp seda uuele perele võtta (muidu näeksid võõra pere andmeid). Vali siis teine parool.
 
 See parool on **sinu pere luku kood**. Sellega krüpteeritakse sinu lapse andmed.
 
@@ -119,7 +124,7 @@ Telefon näitab sama infot. Uuendamiseks peab arvutis olema laiendus käimas (vt
 |---|---|
 | Laiendus ütleb "Pole Stuudiumis sisse logitud" | Logi Stuudiumisse uuel vahelehel sisse ja vajuta **Uuenda kohe** |
 | Äpp ütleb "Selle parooliga pole andmeid" | Kontrolli parooli (sama mis laiendusel). Kui õige, vajuta laiendusel **Uuenda kohe** |
-| Sisestasin vale parooli | Äpis lehe lõpus **🔑 Vaheta parool**. Või lisa lingi lõppu `?reset=1` |
+| Sisestasin vale parooli | Proovi uuesti: äpp ütleb "Selle parooliga pole andmeid" ja jätab parooli parandada. Lehe lõpus on ka **🔑 Vaheta parool**. Või lisa lingi lõppu `?reset=1` |
 | Laiendus ütleb "Ühendus ebaõnnestus" | Kontrolli internetti, siis proovi uuesti |
 | Laienduse aken sulgub | Ikooni klõps avab tavalise vahelehe, kasuta seda |
 | Äpp näitab "Invalid API key" | Võti on vale. Anna teada äpi autorile |
